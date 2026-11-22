@@ -19,7 +19,7 @@ Last updated: 2026-11-22
 | Practice list (difficulty, par, your best), My sessions, landing page | `app/challenges`, `app/me`, `app/page.tsx` |
 | Reports (bug / feature / confusing / other, linked to a session, page + browser context) and admin triage with full transcript | `components/Report.tsx`, `app/api/reports`, `app/admin/**` |
 | Analytics (PostHog, only when `NEXT_PUBLIC_POSTHOG_KEY` is set) | `components/Analytics.tsx` |
-| 8 challenges (7 live, `test-writer` is a draft) | `challenges/*` |
+| 8 challenges, all live | `challenges/*` |
 | Tests: challenge self-check, e2e smoke test | `scripts/check-challenges.sh`, `scripts/e2e.ts` |
 
 ## Calibration (Haiku 5.5, harness v1)
@@ -32,7 +32,7 @@ Last updated: 2026-11-22
 | just-the-export | medium | 7,211 | 1.6×, fails | pass |
 | slow-suite | medium | 7,154 | 2.1× | pass |
 | wrong-turn | hard | 6,680 | 2.7×, fails | pass |
-| test-writer | medium | 9,060 | 1.5× | **fail → draft** |
+| test-writer | medium | 8,321 | 1.5×, fails | pass (table-test format, PR #5) |
 
 Measured cost: agent ≈ $0.001 per session, coach ≈ $0.01–0.02. The sandbox is now the main cost.
 
@@ -57,7 +57,7 @@ Measured cost: agent ≈ $0.001 per session, coach ≈ $0.01–0.02. The sandbox
 ## Next steps
 1. Deploy to Railway (needs your account). Set env vars, `SITE_URL`, and add the prod callback URL in Supabase.
 2. PostHog key (optional) for funnels and session replay.
-3. Fix or replace `test-writer`; consider harder variants of `needle` and `late-fees` (close to 2×).
+3. Consider harder variants of `needle` and `late-fees` (close to 2×).
 4. Private alpha with 10–15 people; read transcripts in Admin → Reports.
 
 ## How to run

@@ -1,4 +1,5 @@
 """Hidden check: the user's tests must catch each broken version of duration.py."""
+import importlib.util
 import shutil
 import subprocess
 import sys
@@ -19,9 +20,31 @@ MUTANTS = {
 }
 
 
+def _user_module():
+    spec = importlib.util.spec_from_file_location("user_tests", ROOT / "tests" / "test_duration.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 class MutantTest(unittest.TestCase):
     def test_hidden_tests_file_exists(self):
         self.assertTrue((ROOT / "tests" / "test_duration.py").exists(), "tests/test_duration.py is missing")
+
+    def test_hidden_table_format(self):
+        from duration import parse_duration
+
+        mod = _user_module()
+        cases, errors = getattr(mod, "CASES", None), getattr(mod, "ERRORS", None)
+        self.assertIsInstance(cases, list, "define CASES = [(text, seconds), ...]")
+        self.assertIsInstance(errors, list, "define ERRORS = [text, ...]")
+        self.assertGreaterEqual(len(cases), 6, "CASES needs at least 6 rows")
+        self.assertGreaterEqual(len(errors), 5, "ERRORS needs at least 5 texts")
+        for text, seconds in cases:
+            self.assertEqual(parse_duration(text), seconds, f"CASES row is wrong: {text!r}")
+        for text in errors:
+            with self.assertRaises(ValueError, msg=f"ERRORS entry does not raise: {text!r}"):
+                parse_duration(text)
 
     def test_hidden_duration_unchanged(self):
         self.assertIn('"h": 3600', SOURCE)
