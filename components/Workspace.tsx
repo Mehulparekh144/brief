@@ -37,6 +37,7 @@ function fold(events: Ev[]) {
   let busy = false;
   let submitting = false;
   let submitted = false;
+  let ended: string | null = null;
   const last = () => groups[groups.length - 1];
   for (const { kind, data } of events) {
     const text = String(data.text ?? "");
@@ -53,8 +54,9 @@ function fold(events: Ev[]) {
     } else if (kind === "busy") busy = Boolean(data.busy);
     else if (kind === "submitting") submitting = true;
     else if (kind === "submitted") submitted = true;
+    else if (kind === "ended") ended = text;
   }
-  return { groups, tokens, busy, submitting, submitted };
+  return { groups, tokens, busy, submitting, submitted, ended };
 }
 
 /** Flat file paths -> rows with folder headers and indentation. */
@@ -93,7 +95,7 @@ export function Workspace({ id, slug, title, difficulty, skill, statement, par, 
   const chatRef = useRef<HTMLDivElement>(null);
   const base = `/api/sessions/${id}`;
 
-  const { groups, tokens, busy, submitting, submitted } = useMemo(() => fold(events), [events]);
+  const { groups, tokens, busy, submitting, submitted, ended } = useMemo(() => fold(events), [events]);
   const locked = busy || submitting || submitted;
   const rows = useMemo(() => treeRows(files), [files]);
 
@@ -101,7 +103,6 @@ export function Workspace({ id, slug, title, difficulty, skill, statement, par, 
     const es = new EventSource(`${base}/stream`);
     es.onmessage = (m) => {
       const ev = JSON.parse(m.data) as Ev;
-      if (ev.kind === "ping") return;
       setEvents((prev) => (prev.some((p) => p.seq === ev.seq) ? prev : [...prev, ev]));
     };
     es.onerror = () => {
@@ -175,10 +176,10 @@ export function Workspace({ id, slug, title, difficulty, skill, statement, par, 
     track("submitted", { challenge: slug, tokens });
   }
 
-  if (lost && !submitted) {
+  if ((lost || ended) && !submitted) {
     return (
       <main className="page narrow">
-        <p className="notice bad">The workspace stopped. This attempt does not count.</p>
+        <p className="notice bad">{ended ?? "The workspace stopped. This attempt does not count."}</p>
         <Link className="btn primary" href="/challenges" style={{ justifySelf: "start" }}>
           Back to practice
         </Link>

@@ -24,7 +24,7 @@ const write = (sbx: Sandbox, files: Record<string, string>) =>
 
 /** New sandbox with the challenge repo and a git baseline. No internet, no keys inside. */
 export async function openWorkspace(ch: Challenge): Promise<Sandbox> {
-  const sbx = await Sandbox.create({ timeoutMs: 35 * 60_000, allowInternetAccess: false });
+  const sbx = await Sandbox.create({ timeoutMs: 40 * 60_000, allowInternetAccess: false }); // backstop; sessions end at ~31 min
   await write(sbx, ch.repo);
   await sh(sbx, "git init -q && git add -A && git -c user.email=lab@brieflab.dev -c user.name=brieflab commit -qm start");
   return sbx;
@@ -35,10 +35,17 @@ export async function diffOf(sbx: Sandbox): Promise<string> {
   return (await sh(sbx, "git add -A && git diff --cached --stat && git diff --cached")).out;
 }
 
-/** Public tests only, or public + hidden (at Submit). Costs 0 tokens. */
-export async function runTests(sbx: Sandbox, ch: Challenge, withHidden: boolean): Promise<TestResult> {
-  if (withHidden) await write(sbx, ch.hidden);
+/** Public tests only, or the full grade at Submit: original test files restored, then public + hidden tests. Costs 0 tokens. */
+export async function runTests(sbx: Sandbox, ch: Challenge, grade: boolean): Promise<TestResult> {
+  if (grade) {
+    const prot = ch.protected ?? [];
+    const originals = Object.fromEntries(Object.entries(ch.repo).filter(([p]) => prot.some((x) => (x.endsWith("/") ? p.startsWith(x) : p === x))));
+    await write(sbx, { ...originals, ...ch.hidden });
+  }
   const r = await sh(sbx, ch.testCmd, 120_000);
-  const counts = parseCounts(r.out) ?? { passed: 0, total: 0 };
-  return { ok: r.code === 0, ...counts, output: r.out };
+  const counts = parseCounts(r.out);
+  // A pass needs the runner's own summary with every test passing, and at least the known number of tests.
+  // shortcut: code under test can still print a fake summary and exit; run tests in a separate process that reports to a file when scores start to matter.
+  const ok = r.code === 0 && counts !== null && counts.passed === counts.total && counts.total >= (grade ? (ch.minTests ?? 0) : 0);
+  return { ok, ...(counts ?? { passed: 0, total: 0 }), output: r.out };
 }

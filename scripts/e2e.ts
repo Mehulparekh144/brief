@@ -154,5 +154,18 @@ assert.equal(saved.session_id, id);
 assert.equal((await call(`/admin/reports/${reportId}`)).status, 404, "non-admins must not see admin pages");
 await admin.from("feedback").delete().eq("id", reportId);
 step(`report #${reportId} saved with session and context; admin page hidden from non-admins`);
+// 12. Start guards: drafts and odd slugs are refused; a double start opens one workspace.
+for (const bad of ["test-writer", "../challenges/late-fees", "late-fees/."]) {
+  const r = await call("/api/sessions", { method: "POST", body: JSON.stringify({ challenge: bad }) });
+  assert.equal(r.status, 404, `start "${bad}" must be refused`);
+}
+const both = await Promise.all([0, 1].map(() => call("/api/sessions", { method: "POST", body: JSON.stringify({ challenge: "late-fees" }) })));
+assert.deepEqual(both.map((r) => r.status).sort(), [200, 409], "a double start must open one workspace");
+const third = (await both.find((r) => r.status === 200)!.json()).id as string;
+await call(`/api/sessions/${third}/submit`, { method: "POST" });
+const after = await call(`/api/sessions/${third}/files`);
+assert.ok([409, 410].includes(after.status), "files must be closed while grading");
+step("start guards: drafts and odd slugs refused, double start opens one workspace, files closed at submit");
+
 console.log(`\nE2E PASSED · ${row.tokens_total} tokens · tests ${row.tests_passed}/${row.tests_total} · agent $${Number(row.cost_usd).toFixed(4)}`);
 process.exit(0);

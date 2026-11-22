@@ -20,6 +20,10 @@ export type Challenge = {
   par?: Par;
   /** Failed the 2× rule or not finished: hidden from the site. */
   draft?: boolean;
+  /** A pass needs at least this many passing tests (public + hidden), so a broken runner cannot fake one. */
+  minTests: number;
+  /** Repo paths (files, or folders ending in /) restored to the original before grading. */
+  protected: string[];
 };
 
 // Run from the project root (npm scripts and next both do). A URL import here would make the bundler pull the folder in.
@@ -50,13 +54,18 @@ export const listChallenges = ({ drafts = false } = {}) =>
     .filter((d) => drafts || !JSON.parse(readFileSync(join(ROOT, d, "challenge.json"), "utf8")).draft)
     .sort();
 
+// Parsed challenges are cached in production; dev reloads them so edits and new par.json show up.
+const cache = new Map<string, Challenge>();
+
 export function loadChallenge(slug: string): Challenge {
+  const hit = cache.get(slug);
+  if (hit) return hit;
   const dir = join(ROOT, slug);
   if (!existsSync(join(dir, "challenge.json"))) {
     throw new Error(`No challenge "${slug}". Choose one of: ${listChallenges().join(", ")}`);
   }
   const meta = JSON.parse(readFileSync(join(dir, "challenge.json"), "utf8"));
-  return {
+  const ch: Challenge = {
     slug,
     ...meta,
     statement: readFileSync(join(dir, "statement.md"), "utf8"),
@@ -64,17 +73,21 @@ export function loadChallenge(slug: string): Challenge {
     hidden: readTree(join(dir, "hidden")),
     par: existsSync(parPath(slug)) ? JSON.parse(readFileSync(parPath(slug), "utf8")) : undefined,
   };
+  if (process.env.NODE_ENV === "production") cache.set(slug, ch);
+  return ch;
 }
 
 /** Reads pass/fail counts from node --test (TAP) or python unittest output. */
 export function parseCounts(out: string): { passed: number; total: number } | null {
-  const p = out.match(/^# pass (\d+)/m);
-  const f = out.match(/^# fail (\d+)/m);
+  // Last match: the runner's own summary comes last; earlier lines may be printed by the code under test.
+  const last = (re: RegExp) => [...out.matchAll(re)].at(-1);
+  const p = last(/^# pass (\d+)/gm);
+  const f = last(/^# fail (\d+)/gm);
   if (p && f) return { passed: +p[1], total: +p[1] + +f[1] };
-  const ran = out.match(/^Ran (\d+) tests?/m);
+  const ran = last(/^Ran (\d+) tests?/gm);
   if (ran) {
     let bad = 0;
-    const failed = out.match(/^FAILED \(([^)]*)\)/m);
+    const failed = last(/^FAILED \(([^)]*)\)/gm);
     if (failed) for (const m of failed[1].matchAll(/(?:failures|errors)=(\d+)/g)) bad += +m[1];
     return { passed: +ran[1] - bad, total: +ran[1] };
   }

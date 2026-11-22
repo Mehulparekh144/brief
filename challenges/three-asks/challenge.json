@@ -4,6 +4,8 @@
   "skill": "Put all your asks in one message",
   "testCmd": "node --test --test-reporter=tap test/*.test.js",
   "tokenCap": 160000,
+  "minTests": 8,
+  "protected": [],
   "briefs": {
     "good": [
       "Make three changes. 1) Rename calcTotal to calculateTotal everywhere: src/, test/ and README.md. 2) In src/config.js, change the default currency to EUR. 3) Add a discount option to calculateTotal: a fraction from 0 to 1, default 0, applied to the subtotal before tax; throw an Error if it is outside 0-1. Update the README example. Then run: node --test test/*.test.js"

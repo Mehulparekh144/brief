@@ -7,8 +7,8 @@ const LEVELS = { easy: 0, medium: 1, hard: 2 } as const;
 export const byDifficulty = (a: { difficulty: keyof typeof LEVELS; title: string }, b: { difficulty: keyof typeof LEVELS; title: string }) =>
   LEVELS[a.difficulty] - LEVELS[b.difficulty] || a.title.localeCompare(b.title);
 
-export const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
-export const k = (n: number) => `${(n / 1000).toFixed(1)}k`;
+export { fmt, k } from "@/src/meter.ts";
+import { k } from "@/src/meter.ts";
 export const parRange = (p: Par | null | undefined) => (p ? `${k(p.low)}–${k(p.high)}` : "not set");
 
 /** "+26% over par" / "12% under par" / "" */

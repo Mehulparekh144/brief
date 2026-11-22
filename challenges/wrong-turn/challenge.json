@@ -4,6 +4,10 @@
   "skill": "Do not repeat a wrong guess; give the agent the real clue",
   "testCmd": "python3 -m unittest discover -s tests -v",
   "tokenCap": 160000,
+  "minTests": 6,
+  "protected": [
+    "tests/"
+  ],
   "briefs": {
     "good": [
       "The duplicate emails are not caused by SMTP retries; do not touch mailer/smtp.py. The cause is in mailer/batch.py: build_batch(users, batch=[]) uses a mutable default list, so addresses from earlier calls stay in the list and later teams get them again. Make it start a new list on every call (batch=None, then batch = [] if None). Only change batch.py. Then run: python3 -m unittest discover -s tests -v"

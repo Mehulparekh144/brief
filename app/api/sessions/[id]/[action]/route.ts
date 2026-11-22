@@ -4,6 +4,8 @@ import { type Ev, getLive, listFiles, publicTests, readFile, sendMessage, stopAg
 
 type Ctx = { params: Promise<{ id: string; action: string }> };
 
+const TERMINAL = new Set(["submitted", "ended"]);
+
 const gone = () => Response.json({ error: "This workspace is no longer running." }, { status: 410 });
 
 function fail(e: unknown) {
@@ -32,32 +34,42 @@ export async function GET(req: NextRequest, { params }: Ctx) {
 
   const after = Number(req.headers.get("last-event-id") ?? 0);
   const enc = new TextEncoder();
-  let cleanup = () => {};
+  let ping: NodeJS.Timeout | undefined;
+  let done = false;
+  let send: (ev: Ev) => void = () => {};
   const stream = new ReadableStream({
     start(controller) {
-      const send = (ev: Ev) => {
-        try {
-          controller.enqueue(enc.encode(`id: ${ev.seq}\ndata: ${JSON.stringify(ev)}\n\n`));
-        } catch {
-          cleanup();
-        }
-      };
-      for (const ev of l.events) if (ev.seq > after) send(ev);
-      l.listeners.add(send);
-      const ping = setInterval(() => send({ seq: 0, kind: "ping", data: {} }), 20_000);
-      cleanup = () => {
-        l.listeners.delete(send);
+      const finish = () => {
+        if (done) return;
+        done = true;
+        l.listeners.delete(send); // frees the stream and its reference to the session
         clearInterval(ping);
-      };
-      req.signal.addEventListener("abort", () => {
-        cleanup();
         try {
           controller.close();
         } catch {}
-      });
+      };
+      const write = (text: string) => {
+        try {
+          controller.enqueue(enc.encode(text));
+        } catch {
+          finish();
+        }
+      };
+      send = (ev: Ev) => {
+        if (done) return;
+        write(`id: ${ev.seq}\ndata: ${JSON.stringify(ev)}\n\n`);
+        if (TERMINAL.has(ev.kind)) finish(); // the session is over
+      };
+      for (const ev of l.events) if (ev.seq > after) send(ev);
+      if (done) return;
+      l.listeners.add(send);
+      ping = setInterval(() => write(": ping\n\n"), 20_000); // a comment line: keeps proxies open, leaves Last-Event-ID alone
+      req.signal.addEventListener("abort", finish);
     },
     cancel() {
-      cleanup();
+      done = true;
+      l.listeners.delete(send);
+      clearInterval(ping);
     },
   });
   return new Response(stream, { headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache, no-transform", Connection: "keep-alive" } });

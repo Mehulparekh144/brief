@@ -4,10 +4,11 @@ import { authClient, db } from "./supabase.ts";
 
 export type Me = { id: string; login: string; avatar: string | null; approved: boolean; admin: boolean };
 
-const admins = () =>
-  (process.env.ADMIN_LOGINS ?? "")
+// Admins by GitHub numeric user id: it never changes, unlike a login, and users cannot edit their identities.
+const adminIds = () =>
+  (process.env.ADMIN_GITHUB_IDS ?? "")
     .split(",")
-    .map((s) => s.trim().toLowerCase())
+    .map((s) => s.trim())
     .filter(Boolean);
 
 /** The signed-in user, or null. */
@@ -15,8 +16,9 @@ export async function currentUser(): Promise<Me | null> {
   const { data } = await (await authClient()).auth.getUser();
   if (!data.user) return null;
   const { data: p } = await db().from("profiles").select("github_login, avatar_url, approved").eq("id", data.user.id).maybeSingle();
-  const login: string = p?.github_login ?? data.user.user_metadata?.user_name ?? "";
-  const admin = admins().includes(login.toLowerCase());
+  const login: string = p?.github_login ?? data.user.user_metadata?.user_name ?? ""; // display only
+  const githubId = data.user.identities?.find((i) => i.provider === "github")?.id;
+  const admin = Boolean(githubId && adminIds().includes(githubId));
   return { id: data.user.id, login, avatar: p?.avatar_url ?? null, approved: Boolean(p?.approved) || admin, admin };
 }
 

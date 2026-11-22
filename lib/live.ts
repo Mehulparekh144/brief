@@ -3,7 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { Sandbox } from "e2b";
 import { posix } from "node:path";
 import { HARNESS_VERSION, MODEL, Session } from "@/src/agent.ts";
-import { type Challenge, capFor, loadChallenge } from "@/src/challenge.ts";
+import { type Challenge, capFor, listChallenges, loadChallenge } from "@/src/challenge.ts";
 import { cost, total } from "@/src/meter.ts";
 import { diffOf, openWorkspace, REPO, runTests, sh } from "@/src/sandbox.ts";
 import { coach } from "./coach.ts";
@@ -38,6 +38,7 @@ export const MAX_MESSAGE = 2000;
 
 const g = globalThis as unknown as { __brieflabLive?: Map<string, Live> };
 const live = (g.__brieflabLive ??= new Map<string, Live>());
+const starting = new Set<string>(); // user ids with a start in progress (blocks double clicks and two tabs)
 let anthropic: Anthropic | undefined;
 
 export class UserError extends Error {
@@ -92,6 +93,17 @@ export function getLive(id: string, userId: string): Live | null {
 
 /** Starts a session: checks limits, opens a sandbox, returns the session id. */
 export async function startSession(userId: string, slug: string, isAdmin: boolean): Promise<string> {
+  if (!listChallenges({ drafts: isAdmin }).includes(slug)) throw new UserError("Unknown challenge.", 404);
+  if (starting.has(userId)) throw new UserError("Your workspace is already starting. Wait a moment.", 409);
+  starting.add(userId);
+  try {
+    return await start(userId, slug, isAdmin);
+  } finally {
+    starting.delete(userId);
+  }
+}
+
+async function start(userId: string, slug: string, isAdmin: boolean): Promise<string> {
   for (const l of live.values()) {
     if (l.userId === userId && !l.closed) {
       if (l.ch.slug === slug) return l.id;
@@ -101,7 +113,7 @@ export async function startSession(userId: string, slug: string, isAdmin: boolea
   const ch = loadChallenge(slug);
   const today = startOfTodayUTC();
   if (!isAdmin) {
-    const { count } = await db().from("sessions").select("id", { count: "exact", head: true }).eq("user_id", userId).gte("started_at", today);
+    const { count } = await db().from("sessions").select("id", { count: "exact", head: true }).eq("user_id", userId).neq("status", "error").gte("started_at", today); // failed starts do not count
     if ((count ?? 0) >= SESSIONS_PER_DAY) throw new UserError(`You used your ${SESSIONS_PER_DAY} sessions for today. Come back tomorrow.`, 429);
   }
   const { data: spend } = await db().from("sessions").select("cost_usd, coach_cost_usd").gte("started_at", today);
@@ -132,9 +144,14 @@ export async function startSession(userId: string, slug: string, isAdmin: boolea
   });
   const started = Date.now();
   l.timer = setInterval(() => {
-    if (l.closed || l.busy) return;
+    if (l.closed) return;
+    const late = Date.now() - started > SESSION_MS;
+    if (l.busy) {
+      if (late) l.session.requestStop(); // ends the agent's turn before its next call; the next tick submits
+      return;
+    }
     const idle = Date.now() - l.lastActivity;
-    if (Date.now() - started > SESSION_MS) void submit(l, "Time is up (30 minutes). Your session was submitted.");
+    if (late) void submit(l, "Time is up (30 minutes). Your session was submitted.");
     else if (idle > IDLE_MS) void submit(l, "No activity for 10 minutes. Your session was submitted.");
     else if (idle > IDLE_WARN_MS && !l.warnedIdle) {
       l.warnedIdle = true;
@@ -179,6 +196,7 @@ export function stopAgent(l: Live) {
 }
 
 export async function publicTests(l: Live) {
+  if (l.closed) throw new UserError("This session is being graded.", 409);
   if (l.busy) throw new UserError("Wait for the agent to finish, or press Stop.", 409);
   l.lastActivity = Date.now();
   const r = await runTests(l.sbx, l.ch, false);
@@ -187,11 +205,13 @@ export async function publicTests(l: Live) {
 
 /** Files in the repo (reading costs 0 tokens). */
 export async function listFiles(l: Live): Promise<string[]> {
+  if (l.closed) throw new UserError("This session is being graded.", 409); // hidden tests are in the sandbox now
   const r = await sh(l.sbx, "find . -type f -not -path './.git/*' | sed 's#^./##' | sort");
   return r.out.split("\n").filter(Boolean);
 }
 
 export async function readFile(l: Live, path: string): Promise<string> {
+  if (l.closed) throw new UserError("This session is being graded.", 409);
   const abs = posix.resolve(REPO, path);
   if (!abs.startsWith(`${REPO}/`)) throw new UserError("Bad path.");
   l.lastActivity = Date.now();
@@ -223,7 +243,7 @@ export async function submit(l: Live, reason?: string) {
   } catch (e) {
     console.error("submit:", e);
     await db().from("sessions").update({ status: "error", ended_at: new Date().toISOString() }).eq("id", l.id);
-    emit(l, "error", { text: "Grading failed. This attempt does not count." });
+    emit(l, "ended", { text: "Grading failed. This attempt does not count. Start again." });
   } finally {
     await l.sbx.kill().catch(() => {});
     setTimeout(() => live.delete(l.id), 120_000); // late stream readers can still replay
