@@ -18,7 +18,7 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
 
   // Pages may run in another process than the live session (next dev), so read its state from the database.
   // A just-started session has a fresh heartbeat; the stream route returns 410 if the server lost it anyway.
-  if (row.status !== "active" || row.heartbeat_at < staleBefore()) {
+  if (row.status !== "active" || Date.parse(row.heartbeat_at) < Date.parse(staleBefore())) {
     return (
       <>
         <Topbar me={me} />
