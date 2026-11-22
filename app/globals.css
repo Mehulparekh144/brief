@@ -222,3 +222,4 @@ dialog.report::backdrop { background: rgb(15 18 21 / 0.45); }
 .kind.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .kind:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
 select { font: 14px var(--f-ui); color: var(--ink); background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; }
+.notice.resume { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }

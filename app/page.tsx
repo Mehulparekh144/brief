@@ -27,7 +27,7 @@ export default async function Landing({ searchParams }: { searchParams: Promise<
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             {me?.approved ? (
               <Link className="btn primary big" href="/challenges">
-                Go to challenges
+                Go to practice
               </Link>
             ) : me ? (
               <Link className="btn primary big" href="/waitlist">

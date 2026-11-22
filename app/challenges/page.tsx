@@ -4,6 +4,8 @@ import { requireUser } from "@/lib/auth.ts";
 import { DifficultyChip } from "@/components/Bits.tsx";
 import { byDifficulty, fmt, PAR_TEXT, parRange } from "@/lib/format.ts";
 import { startChallenge } from "@/lib/actions.ts";
+import { liveSessionOf } from "@/lib/live.ts";
+import Link from "next/link";
 import { db } from "@/lib/supabase.ts";
 import { listChallenges, loadChallenge } from "@/src/challenge.ts";
 
@@ -12,6 +14,7 @@ export const dynamic = "force-dynamic";
 export default async function ChallengesPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const me = await requireUser();
   const { error } = await searchParams;
+  const running = liveSessionOf(me.id);
   const challenges = listChallenges().map(loadChallenge).sort(byDifficulty);
   const { data: rows } = await db().from("sessions").select("challenge, tokens_total, passed").eq("user_id", me.id).eq("status", "submitted");
   const best = new Map<string, { best: number | null; tries: number }>();
@@ -35,6 +38,16 @@ export default async function ChallengesPage({ searchParams }: { searchParams: P
           <b>What is par?</b>
           <span>{PAR_TEXT}</span>
         </div>
+        {running && (
+          <div className="notice resume">
+            <span>
+              Your <b>{running.title}</b> session is still open{running.busy ? " and the agent is working" : ""}. Finish or submit it before you start another one.
+            </span>
+            <Link className="btn primary" href={`/s/${running.id}`}>
+              Resume
+            </Link>
+          </div>
+        )}
         {error && <p className="notice bad">{error}</p>}
         <div className="ch-list">
           {challenges.map((ch) => {

@@ -45,7 +45,8 @@ const started = await call("/api/sessions", { method: "POST", body: JSON.stringi
 const { id, error } = await started.json();
 assert.ok(id, `start failed: ${error}`);
 assert.equal((await call(`/s/${id}`)).status, 200);
-step(`session ${id} started, workspace loads`);
+assert.match(await (await call("/challenges")).text(), new RegExp(`href="/s/${id}"[^>]*>Resume`), "Practice must offer Resume for the live session");
+step(`session ${id} started, workspace loads, Practice shows Resume`);
 
 // 4. Read the event stream in the background.
 type Ev = { seq: number; kind: string; data: Record<string, unknown> };

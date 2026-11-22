@@ -85,6 +85,12 @@ async function saveTotals(l: Live, extra: Record<string, unknown> = {}) {
   if (error) console.error("sessions update:", error.message);
 }
 
+/** This user's running session, if any (for the "Resume" banner). */
+export function liveSessionOf(userId: string): { id: string; title: string; busy: boolean } | null {
+  for (const l of live.values()) if (l.userId === userId && !l.closed) return { id: l.id, title: l.ch.title, busy: l.busy };
+  return null;
+}
+
 /** The live session, if it belongs to this user. */
 export function getLive(id: string, userId: string): Live | null {
   const l = live.get(id);
