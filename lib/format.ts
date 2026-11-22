@@ -1,5 +1,8 @@
 import type { Par } from "@/src/challenge.ts";
 
+/** A live session refreshes heartbeat_at every 15 s; one silent for 60 s is gone (server restart or crash). */
+export const staleBefore = () => new Date(Date.now() - 60_000).toISOString();
+
 export const PAR_TEXT =
   "Par is the token count of a good brief. We solved each challenge with one clear first message, 3 times, on the same model you use. The range is our lowest to highest run. Like golf: fewer is better. Finish under par and you briefed better than our reference.";
 

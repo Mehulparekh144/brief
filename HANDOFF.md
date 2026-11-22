@@ -40,12 +40,15 @@ Measured cost: agent ≈ $0.001 per session, coach ≈ $0.01–0.02. The sandbox
 - Agent loop on our server; only tools run in the sandbox (no keys or internet inside). No LiteLLM.
 - Manual loop instead of the SDK tool runner: cap checks before each call and per-message token counts.
 - Live sessions in server memory (`shortcut:` comment in `lib/live.ts`). One server only; a redeploy ends live sessions.
+- Only API routes import `lib/live.ts`. Pages read session state from the database (`status`, `heartbeat_at`). Starts go through `POST /api/sessions` from the browser, not a server action.
+- Live sessions write `heartbeat_at` every 15 s. A sweep (on start, every 5 min) closes sessions silent for 60 s and kills sandboxes without an active session (sandbox metadata: app, site, session).
 - All DB access on the server with the secret key; RLS on with no policies, so browsers have no table access.
 - Plain CSS with brand tokens (no Tailwind/shadcn): the design was already written as CSS.
 - Nav labels: "Practice" and "My sessions" (user's choice). Feedback is one "Report" dialog with types.
 - Coach on Claude Opus 5.5 with `fallbacks: "default"` (server-side refusal fallback, beta `server-side-fallback-2026-07-01`).
 
 ## Gotchas
+- `next dev` serves pages, server actions and API routes from **separate processes**; `next start` uses one. Never share in-memory state between a page and an API route.
 - Next.js 16: `middleware.ts` is now `proxy.ts`. `params`/`searchParams` are promises. Read `node_modules/next/dist/docs/` first (see AGENTS.md).
 - TypeScript is pinned to 5.9 (Next.js does not support TS 7 yet).
 - `src/challenge.ts` reads `challenges/` from `process.cwd()`; a `new URL(..., import.meta.url)` there breaks the Next build.

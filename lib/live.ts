@@ -1,12 +1,13 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
-import type { Sandbox } from "e2b";
+import { Sandbox } from "e2b";
 import { posix } from "node:path";
 import { HARNESS_VERSION, MODEL, Session } from "@/src/agent.ts";
 import { type Challenge, capFor, listChallenges, loadChallenge } from "@/src/challenge.ts";
 import { cost, total } from "@/src/meter.ts";
 import { diffOf, openWorkspace, REPO, runTests, sh } from "@/src/sandbox.ts";
 import { coach } from "./coach.ts";
+import { staleBefore } from "./format.ts";
 import { db } from "./supabase.ts";
 
 // shortcut: live sessions live in this server's memory. One server only; a redeploy ends them.
@@ -36,8 +37,42 @@ const IDLE_MS = 10 * 60_000;
 export const SESSIONS_PER_DAY = 5;
 export const MAX_MESSAGE = 2000;
 
-const g = globalThis as unknown as { __brieflabLive?: Map<string, Live> };
+// Only API routes may touch live sessions. `next dev` serves pages, server actions and routes from separate
+// processes; pages read session state from the database instead (see app/s/[id] and app/challenges).
+const g = globalThis as unknown as { __brieflabLive?: Map<string, Live>; __brieflabTimers?: boolean };
 const live = (g.__brieflabLive ??= new Map<string, Live>());
+const SANDBOX_TAG = { app: "brieflab", site: process.env.SITE_URL || "local" };
+const HEARTBEAT_MS = 15_000;
+
+/** Closes silent sessions and kills sandboxes whose session is not live. Safe to run from any process. */
+async function sweep() {
+  const { error } = await db().from("sessions").update({ status: "error", ended_at: new Date().toISOString() }).eq("status", "active").lt("heartbeat_at", staleBefore());
+  if (error) return console.error("sweep (sessions):", error.message);
+  try {
+    const { data: active } = await db().from("sessions").select("id").eq("status", "active");
+    const keep = new Set((active ?? []).map((r) => r.id));
+    const pager = Sandbox.list({ query: { metadata: SANDBOX_TAG } });
+    let killed = 0;
+    while (pager.hasNext) {
+      for (const s of await pager.nextItems()) if (!keep.has(s.metadata.session)) killed += Number(await Sandbox.kill(s.sandboxId));
+    }
+    if (killed) console.log(`sweep: killed ${killed} orphaned sandbox(es)`);
+  } catch (e) {
+    console.error("sweep (sandboxes):", (e as Error).message);
+  }
+}
+
+// One set of timers per process (globalThis survives dev hot reloads).
+if (!g.__brieflabTimers) {
+  g.__brieflabTimers = true;
+  setInterval(() => {
+    const ids = [...live.values()].filter((l) => !l.closed).map((l) => l.id);
+    if (ids.length) void db().from("sessions").update({ heartbeat_at: new Date().toISOString() }).in("id", ids).then(({ error }) => error && console.error("heartbeat:", error.message));
+  }, HEARTBEAT_MS).unref();
+  setInterval(() => void sweep(), 5 * 60_000).unref();
+  void sweep();
+}
+
 const starting = new Set<string>(); // user ids with a start in progress (blocks double clicks and two tabs)
 let anthropic: Anthropic | undefined;
 
@@ -85,11 +120,8 @@ async function saveTotals(l: Live, extra: Record<string, unknown> = {}) {
   if (error) console.error("sessions update:", error.message);
 }
 
-/** This user's running session, if any (for the "Resume" banner). */
-export function liveSessionOf(userId: string): { id: string; title: string; busy: boolean } | null {
-  for (const l of live.values()) if (l.userId === userId && !l.closed) return { id: l.id, title: l.ch.title, busy: l.busy };
-  return null;
-}
+/** Number of live sessions on this server (health check). */
+export const liveCount = () => [...live.values()].filter((l) => !l.closed).length;
 
 /** The live session, if it belongs to this user. */
 export function getLive(id: string, userId: string): Live | null {
@@ -111,10 +143,14 @@ export async function startSession(userId: string, slug: string, isAdmin: boolea
 
 async function start(userId: string, slug: string, isAdmin: boolean): Promise<string> {
   for (const l of live.values()) {
-    if (l.userId === userId && !l.closed) {
-      if (l.ch.slug === slug) return l.id;
-      throw new UserError(`Finish or submit your "${l.ch.title}" session first.`, 409);
+    if (l.userId !== userId || l.closed) continue;
+    const { data: row } = await db().from("sessions").select("status").eq("id", l.id).maybeSingle();
+    if (row?.status !== "active") {
+      await discard(l); // the database says it is over (swept or removed): do not let it block the user
+      continue;
     }
+    if (l.ch.slug === slug) return l.id;
+    throw new UserError(`Finish or submit your "${l.ch.title}" session first.`, 409);
   }
   const ch = loadChallenge(slug);
   const today = startOfTodayUTC();
@@ -135,7 +171,7 @@ async function start(userId: string, slug: string, isAdmin: boolean): Promise<st
 
   let sbx: Sandbox;
   try {
-    sbx = await openWorkspace(ch);
+    sbx = await openWorkspace(ch, { ...SANDBOX_TAG, session: row.id });
   } catch (e) {
     await db().from("sessions").update({ status: "error", ended_at: new Date().toISOString() }).eq("id", row.id);
     console.error("sandbox:", (e as Error).message);
@@ -168,6 +204,16 @@ async function start(userId: string, slug: string, isAdmin: boolean): Promise<st
   emit(l, "ready", { cap: capFor(ch) });
   meter(l);
   return l.id;
+}
+
+/** Drops a live session without grading. */
+async function discard(l: Live) {
+  l.closed = true;
+  clearInterval(l.timer);
+  l.session.requestStop();
+  emit(l, "ended", { text: "This session was closed. It does not count." });
+  live.delete(l.id);
+  await l.sbx.kill().catch(() => {});
 }
 
 export function sendMessage(l: Live, text: string) {

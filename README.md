@@ -40,3 +40,15 @@ flowchart LR
 ## Add a challenge
 
 Create `challenges/<slug>/` with `challenge.json`, `statement.md`, `repo/`, `hidden/` and `solution/`. Run `npm run check`, then `npm run calibrate -- <slug>`. Ship it only if it passes the 2× rule; otherwise set `"draft": true`.
+
+## Deploy (Railway)
+
+The app needs one always-on Node server: live sessions run for up to 30 minutes and stay in memory.
+
+1. In Railway, create a project from this GitHub repo. Railway runs `npm run build` and `npm start`. Node comes from `engines` (22.18 or later).
+2. Add the variables from `.env.example`. Set `SITE_URL` to the public URL, for example `https://brieflab.up.railway.app`. `DATABASE_URL` is not needed at runtime.
+3. Use a separate E2B key for production. On start and every 5 minutes, the server closes sessions that stopped sending heartbeats, and kills its sandboxes (tagged with its `SITE_URL`) that have no active session.
+4. Set the health check path to `/api/health`.
+5. In Supabase → Authentication → URL Configuration, add `<SITE_URL>/auth/callback` to the redirect URLs, and set the Site URL to `SITE_URL`.
+6. In the GitHub OAuth app, set the homepage URL to `SITE_URL`. The callback URL stays the Supabase one.
+7. Deploy outside busy hours: a redeploy ends live sessions. The new server marks them as errors (they do not count) and kills their sandboxes.

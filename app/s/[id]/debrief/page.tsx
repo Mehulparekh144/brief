@@ -5,7 +5,6 @@ import { AutoRefresh, DebriefRating } from "@/components/Feedback.tsx";
 import { DifficultyChip, ParHelp } from "@/components/Bits.tsx";
 import { StartButton } from "@/components/StartButton.tsx";
 import { Topbar } from "@/components/Topbar.tsx";
-import { startChallenge } from "@/lib/actions.ts";
 import { requireUser } from "@/lib/auth.ts";
 import type { Debrief } from "@/lib/coach.ts";
 import { fmt, k, parRange, verdict, vsPar } from "@/lib/format.ts";
@@ -218,10 +217,7 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
               </>
             )}
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <form action={startChallenge}>
-                <input type="hidden" name="slug" value={ch.slug} />
-                <StartButton label="Try again" />
-              </form>
+              <StartButton slug={ch.slug} label="Try again" />
               <Link className="btn" href="/challenges">
                 All challenges
               </Link>
