@@ -1,0 +1,15 @@
+{
+  "title": "Needle",
+  "difficulty": "medium",
+  "skill": "Read the code first, then point the agent at it",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "briefs": {
+    "good": [
+      "In src/pricing/discounts.js, applyDiscount() reads DISCOUNTS[code] directly. A code with other letter case or spaces around it, or an unknown code, gives undefined and crashes on d.minSubtotal. Normalize the code with trim() and toLowerCase(), and return 0 when the code is unknown. Only change that file. Then run: node --test test/*.test.js"
+    ],
+    "lazy": [
+      "Checkout crashes with some discount codes. Fix it."
+    ]
+  }
+}

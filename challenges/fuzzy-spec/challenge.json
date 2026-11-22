@@ -1,0 +1,15 @@
+{
+  "title": "Fuzzy spec",
+  "difficulty": "medium",
+  "skill": "State the rules before the agent starts",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "briefs": {
+    "good": [
+      "Implement slugify(title) in slug.py with these exact rules: 1) lowercase; 2) turn accented letters into plain ASCII letters (Café -> cafe) with unicodedata NFKD and drop what is left; 3) any run of characters that are not a-z or 0-9 becomes one hyphen; 4) no hyphen at the start or end; 5) at most 50 characters: keep the longest run of whole words that fits, and if the first word alone is longer than 50, cut it at 50; 6) if the result is empty, return \"post\". Only change slug.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Implement slugify properly for blog URLs."
+    ]
+  }
+}
