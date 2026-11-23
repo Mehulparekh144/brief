@@ -32,5 +32,8 @@
     "pg": "^8.23.1",
     "typescript": "5.9"
   },
-  "private": true
+  "private": true,
+  "engines": {
+    "node": ">=22.18"
+  }
 }

@@ -20,7 +20,6 @@ let userId = users.users.find((u) => u.email === EMAIL)?.id;
 if (userId) await admin.auth.admin.updateUserById(userId, { password });
 else userId = (await admin.auth.admin.createUser({ email: EMAIL, password, email_confirm: true })).data.user!.id;
 await admin.from("profiles").update({ approved: true, github_login: "e2e-test" }).eq("id", userId);
-await admin.from("sessions").delete().eq("user_id", userId);
 step(`test user ${userId}`);
 
 // 2. Sign in and keep the auth cookies the app expects.
@@ -34,6 +33,11 @@ const cookie = [...jar].map(([n, v]) => `${n}=${v}`).join("; ");
 const call = (path: string, init: RequestInit = {}) =>
   fetch(BASE + path, { ...init, redirect: "manual", headers: { cookie, "content-type": "application/json", ...init.headers } });
 
+// Close sessions an earlier, crashed run left open (else "one live session" blocks this run), then clear rows.
+const { data: leftovers } = await admin.from("sessions").select("id").eq("user_id", userId).eq("status", "active");
+for (const s of leftovers ?? []) await call(`/api/sessions/${s.id}/submit`, { method: "POST" });
+await admin.from("sessions").delete().eq("user_id", userId);
+
 for (const p of ["/", "/challenges", "/me"]) {
   const r = await call(p);
   assert.equal(r.status, 200, `${p} returned ${r.status}`);
@@ -44,7 +48,9 @@ step("pages load: /, /challenges, /me");
 const started = await call("/api/sessions", { method: "POST", body: JSON.stringify({ challenge: "late-fees" }) });
 const { id, error } = await started.json();
 assert.ok(id, `start failed: ${error}`);
-assert.equal((await call(`/s/${id}`)).status, 200);
+const wsPage = await call(`/s/${id}`);
+assert.equal(wsPage.status, 200);
+assert.doesNotMatch(await wsPage.text(), /workspace stopped/i, "the workspace page must find the live session");
 assert.match(await (await call("/challenges")).text(), new RegExp(`href="/s/${id}"[^>]*>Resume`), "Practice must offer Resume for the live session");
 step(`session ${id} started, workspace loads, Practice shows Resume`);
 
@@ -156,7 +162,7 @@ assert.equal((await call(`/admin/reports/${reportId}`)).status, 404, "non-admins
 await admin.from("feedback").delete().eq("id", reportId);
 step(`report #${reportId} saved with session and context; admin page hidden from non-admins`);
 // 12. Start guards: drafts and odd slugs are refused; a double start opens one workspace.
-for (const bad of ["test-writer", "../challenges/late-fees", "late-fees/."]) {
+for (const bad of ["does-not-exist", "../challenges/late-fees", "late-fees/."]) {
   const r = await call("/api/sessions", { method: "POST", body: JSON.stringify({ challenge: bad }) });
   assert.equal(r.status, 404, `start "${bad}" must be refused`);
 }
@@ -166,7 +172,7 @@ const third = (await both.find((r) => r.status === 200)!.json()).id as string;
 await call(`/api/sessions/${third}/submit`, { method: "POST" });
 const after = await call(`/api/sessions/${third}/files`);
 assert.ok([409, 410].includes(after.status), "files must be closed while grading");
-step("start guards: drafts and odd slugs refused, double start opens one workspace, files closed at submit");
+step("start guards: unknown and odd slugs refused, double start opens one workspace, files closed at submit");
 
 console.log(`\nE2E PASSED · ${row.tokens_total} tokens · tests ${row.tests_passed}/${row.tests_total} · agent $${Number(row.cost_usd).toFixed(4)}`);
 process.exit(0);

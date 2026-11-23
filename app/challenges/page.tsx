@@ -2,10 +2,9 @@ import { StartButton } from "@/components/StartButton.tsx";
 import { Topbar } from "@/components/Topbar.tsx";
 import { requireUser } from "@/lib/auth.ts";
 import { DifficultyChip } from "@/components/Bits.tsx";
-import { byDifficulty, fmt, PAR_TEXT, parRange } from "@/lib/format.ts";
-import { startChallenge } from "@/lib/actions.ts";
-import { liveSessionOf } from "@/lib/live.ts";
+import { byDifficulty, fmt, PAR_TEXT, parRange, staleBefore } from "@/lib/format.ts";
 import Link from "next/link";
+
 import { db } from "@/lib/supabase.ts";
 import { listChallenges, loadChallenge } from "@/src/challenge.ts";
 
@@ -14,7 +13,8 @@ export const dynamic = "force-dynamic";
 export default async function ChallengesPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const me = await requireUser();
   const { error } = await searchParams;
-  const running = liveSessionOf(me.id);
+  const { data: open } = await db().from("sessions").select("id, challenge").eq("user_id", me.id).eq("status", "active").gte("heartbeat_at", staleBefore()).order("started_at", { ascending: false }).limit(1);
+  const running = open?.[0] ? { id: open[0].id, title: loadChallenge(open[0].challenge).title } : null;
   const challenges = listChallenges().map(loadChallenge).sort(byDifficulty);
   const { data: rows } = await db().from("sessions").select("challenge, tokens_total, passed").eq("user_id", me.id).eq("status", "submitted");
   const best = new Map<string, { best: number | null; tries: number }>();
@@ -41,7 +41,7 @@ export default async function ChallengesPage({ searchParams }: { searchParams: P
         {running && (
           <div className="notice resume">
             <span>
-              Your <b>{running.title}</b> session is still open{running.busy ? " and the agent is working" : ""}. Finish or submit it before you start another one.
+              Your <b>{running.title}</b> session is still open. Finish or submit it before you start another one.
             </span>
             <Link className="btn primary" href={`/s/${running.id}`}>
               Resume
@@ -53,8 +53,7 @@ export default async function ChallengesPage({ searchParams }: { searchParams: P
           {challenges.map((ch) => {
             const b = best.get(ch.slug);
             return (
-              <form key={ch.slug} action={startChallenge} className="ch-row">
-                <input type="hidden" name="slug" value={ch.slug} />
+              <div key={ch.slug} className="ch-row">
                 <div style={{ display: "grid", gap: 4 }}>
                   <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                     <h3>{ch.title}</h3>
@@ -73,8 +72,8 @@ export default async function ChallengesPage({ searchParams }: { searchParams: P
                   <br />
                   {b?.best != null ? fmt(b.best) : b?.tries ? `${b.tries} tries` : "—"}
                 </div>
-                <StartButton label={b?.tries ? "Try again" : "Start"} />
-              </form>
+                <StartButton slug={ch.slug} label={b?.tries ? "Try again" : "Start"} />
+              </div>
             );
           })}
         </div>

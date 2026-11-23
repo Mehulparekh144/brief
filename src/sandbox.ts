@@ -23,8 +23,9 @@ const write = (sbx: Sandbox, files: Record<string, string>) =>
   sbx.files.write(Object.entries(files).map(([path, data]) => ({ path: `${REPO}/${path}`, data })));
 
 /** New sandbox with the challenge repo and a git baseline. No internet, no keys inside. */
-export async function openWorkspace(ch: Challenge): Promise<Sandbox> {
-  const sbx = await Sandbox.create({ timeoutMs: 40 * 60_000, allowInternetAccess: false }); // backstop; sessions end at ~31 min
+export async function openWorkspace(ch: Challenge, metadata: Record<string, string> = { app: "brieflab-script" }): Promise<Sandbox> {
+  // 40 min is a backstop; sessions end at ~31 min. metadata lets the web server find and kill its own leftovers.
+  const sbx = await Sandbox.create({ timeoutMs: 40 * 60_000, allowInternetAccess: false, metadata });
   await write(sbx, ch.repo);
   await sh(sbx, "git init -q && git add -A && git -c user.email=lab@brieflab.dev -c user.name=brieflab commit -qm start");
   return sbx;
