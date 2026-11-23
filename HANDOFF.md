@@ -48,6 +48,8 @@ Measured cost: agent ≈ $0.001 per session, coach ≈ $0.01–0.02. The sandbox
 - Coach on Claude Opus 5.5 with `fallbacks: "default"` (server-side refusal fallback, beta `server-side-fallback-2026-07-01`).
 
 ## Gotchas
+- Links: no underline by default (`a:hover, p a` only). Use `.filter-tabs` for tab bars, not `pill` links.
+- `npm run e2e` deletes the e2e user's sessions and feedback, so test data stays out of Admin → Reports.
 - `next dev` serves pages, server actions and API routes from **separate processes**; `next start` uses one. Never share in-memory state between a page and an API route.
 - Next.js 16: `middleware.ts` is now `proxy.ts`. `params`/`searchParams` are promises. Read `node_modules/next/dist/docs/` first (see AGENTS.md).
 - TypeScript is pinned to 5.9 (Next.js does not support TS 7 yet).
