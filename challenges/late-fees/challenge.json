@@ -1,0 +1,19 @@
+{
+  "title": "Late fees",
+  "difficulty": "easy",
+  "skill": "Name the file and the symptom",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "In src/billing/lateFee.js, isLate() compares timestamps with >=, so a payment at any time on the due date counts as late. A payment is late only when it is made on a later calendar day (UTC) than the due date. Fix isLate() with daysBetween from src/dates/compare.js. Do not change other files. Then run: node --test test/*.test.js"
+    ],
+    "lazy": [
+      "fix the late fee bug"
+    ]
+  }
+}

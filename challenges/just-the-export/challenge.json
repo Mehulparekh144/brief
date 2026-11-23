@@ -1,0 +1,19 @@
+{
+  "title": "Just the export",
+  "difficulty": "medium",
+  "skill": "Set the scope: say what not to change",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 7,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "Create one new file, src/export/csv.js, that exports toCSV(rows, columns). Rules: first line is the column names joined by commas; then one line per row with the values in column order (missing values are empty); a value that contains a comma, a double quote or a newline is wrapped in double quotes, with each inner double quote doubled; numbers are written with String(n); lines are joined with \\n and there is no newline at the end. Do not change or refactor any existing file, including src/index.js and src/report.js. Then run: node --test test/*.test.js"
+    ],
+    "lazy": [
+      "Add a CSV export for the order report."
+    ]
+  }
+}

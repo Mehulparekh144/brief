@@ -1,0 +1,6 @@
+INFO team=design recipients=2
+INFO team=backend recipients=5
+WARNING SMTP timeout, retrying (attempt 2/3) to=kim@example.com
+INFO team=support recipients=7
+WARNING SMTP timeout, retrying (attempt 2/3) to=ravi@example.com
+WARNING SMTP timeout, retrying (attempt 3/3) to=ravi@example.com

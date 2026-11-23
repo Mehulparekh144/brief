@@ -1,0 +1,19 @@
+{
+  "title": "Test writer",
+  "difficulty": "medium",
+  "skill": "Show the agent the exact shape you want",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 6,
+  "protected": [
+    "tests/test_smoke.py"
+  ],
+  "briefs": {
+    "good": [
+      "Create tests/test_duration.py for parse_duration() in duration.py. Use unittest and start the file like tests/test_smoke.py (sys.path insert). Table-test format: CASES = [('2h', 7200), ('5m', 300), ('9s', 9), ('1h30m', 5400), ('1h2m3s', 3723), (' 1H 30M ', 5400), ('0s', 0)] and ERRORS = ['', '   ', '5d', '30m1h', '1h2h', '10m5']. One test loops over CASES with self.subTest and assertEqual; one loops over ERRORS with self.subTest and assertRaises(ValueError). Do not change duration.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Write some tests for the duration parser."
+    ]
+  }
+}
