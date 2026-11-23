@@ -37,6 +37,7 @@ const call = (path: string, init: RequestInit = {}) =>
 const { data: leftovers } = await admin.from("sessions").select("id").eq("user_id", userId).eq("status", "active");
 for (const s of leftovers ?? []) await call(`/api/sessions/${s.id}/submit`, { method: "POST" });
 await admin.from("sessions").delete().eq("user_id", userId);
+await admin.from("feedback").delete().eq("user_id", userId);
 
 for (const p of ["/", "/challenges", "/me"]) {
   const r = await call(p);
@@ -174,5 +175,6 @@ const after = await call(`/api/sessions/${third}/files`);
 assert.ok([409, 410].includes(after.status), "files must be closed while grading");
 step("start guards: unknown and odd slugs refused, double start opens one workspace, files closed at submit");
 
+await admin.from("feedback").delete().eq("user_id", userId); // keep test ratings out of Admin → Reports
 console.log(`\nE2E PASSED · ${row.tokens_total} tokens · tests ${row.tests_passed}/${row.tests_total} · agent $${Number(row.cost_usd).toFixed(4)}`);
 process.exit(0);

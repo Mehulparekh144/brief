@@ -35,17 +35,17 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             {avg !== null && ` · average ${avg.toFixed(2)} / 5`}
           </p>
         </header>
-        <nav style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <nav className="filter-tabs" aria-label="Filter reports">
           {[undefined, "bug", "feature", "confusing", "other", "note", "rating"].map((k) => (
-            <Link key={k ?? "all"} className={`pill ${kind === k ? "good" : ""}`} href={link(k, status)}>
+            <Link key={k ?? "all"} href={link(k, status)} aria-current={kind === k ? "page" : undefined}>
               {k ? KIND_LABEL[k] : "All"}
             </Link>
           ))}
-          <span style={{ width: 16 }} />
-          <Link className={`pill ${status === "open" ? "good" : ""}`} href={link(kind, "open")}>
+          <span className="spacer" />
+          <Link href={link(kind, "open")} aria-current={status === "open" ? "page" : undefined}>
             Open
           </Link>
-          <Link className={`pill ${status === "all" ? "good" : ""}`} href={link(kind, "all")}>
+          <Link href={link(kind, "all")} aria-current={status === "all" ? "page" : undefined}>
             Include done
           </Link>
         </nav>
@@ -65,9 +65,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             <tbody>
               {(rows ?? []).map((r) => (
                 <tr key={r.id}>
-                  <td className="num">
-                    <Link href={`/admin/reports/${r.id}`}>{r.id}</Link>
-                  </td>
+                  <td className="num muted">{r.id}</td>
                   <td>
                     <span className={`pill ${KIND_TONE[r.kind] ?? ""}`}>{KIND_LABEL[r.kind] ?? r.kind}</span>
                   </td>
