@@ -1,0 +1,18 @@
+{
+  "title": "Rename field",
+  "difficulty": "easy",
+  "category": "refactor",
+  "skill": "Say what must keep working after a rename",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [],
+  "briefs": {
+    "good": [
+      "Rename the User field user_name to username in accounts/models.py, accounts/store.py, accounts/report.py, tests/test_accounts.py and README.md (example and export format; the README must not mention user_name). Also rename the find_user parameter to username. dump_users writes the key \"username\" only. load_users must still accept old records with \"user_name\": use record.get(\"username\", record.get(\"user_name\")), so username wins when both exist; if neither exists, raise ValueError(\"username is required\"). The old name may stay only in that loader line. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Rename user_name to username."
+    ]
+  }
+}

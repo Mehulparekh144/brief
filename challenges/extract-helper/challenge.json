@@ -1,0 +1,20 @@
+{
+  "title": "Extract a helper",
+  "difficulty": "medium",
+  "category": "refactor",
+  "skill": "Name the helper, its contract and its callers",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Create shop/validators.py with require_positive(name, value): if value is a bool, not an int/float, not math.isfinite, or <= 0, raise ValueError(f\"{name} must be a positive number, got {value!r}\"); else return value. In shop/pricing.py (line_total: price then qty), shop/inventory.py (restock: qty) and shop/shipping.py (shipping_cost: weight_kg), add from shop.validators import require_positive, call require_positive(\"<param name>\", <param>), and delete the old inline checks completely. Change nothing else. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "The positive-number check is copied in three modules. Extract it into a helper."
+    ]
+  }
+}

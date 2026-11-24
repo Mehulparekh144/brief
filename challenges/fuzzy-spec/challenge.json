@@ -1,6 +1,7 @@
 {
   "title": "Fuzzy spec",
   "difficulty": "medium",
+  "category": "spec",
   "skill": "State the rules before the agent starts",
   "testCmd": "python3 -m unittest discover -s tests -v",
   "tokenCap": 160000,

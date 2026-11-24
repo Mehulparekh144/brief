@@ -1,0 +1,20 @@
+{
+  "title": "Config precedence",
+  "difficulty": "medium",
+  "category": "bug-fix",
+  "skill": "Give the precedence order and the type rules",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "In src/config/load.js, loadConfig(defaults, file, env, cli) spreads env after cli, keeps env values as strings, and keeps unknown APP_ keys. Rules: precedence cli > env > file > defaults; for each APP_ variable, get the key with keyFromEnv(), skip it if the key is not in defaults, and convert the string to the type of defaults[key] (number: Number(v); boolean: \"true\" -> true, \"false\" -> false; string: unchanged). Ignore variables without APP_. Do not convert file or cli values. Only change that file. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "Config loading is buggy. Fix it."
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Add a handler",
+  "difficulty": "medium",
+  "category": "refactor",
+  "skill": "Point the agent at the pattern and fence off the rest",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Add a delete command. Create todo/commands/delete.py modeled on todo/commands/done.py: @command(\"delete\", \"Delete a task by id\"); if len(args) != 1 or the arg is not all digits, print \"usage: delete <id>\" and return 2; task = store.remove(int(id)); if None, print \"No task <id>\" and return 1; else print \"Deleted task <id>: <text>\" and return 0. Add delete to the import line in todo/commands/__init__.py. Do not change any other file (cli.py, registry.py, store.py, add.py, done.py, ls.py). Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Add a delete command to the todo CLI."
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "draft": true,
+  "title": "Word wrap",
+  "difficulty": "medium",
+  "category": "spec",
+  "skill": "Describe the output format exactly",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 8,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite wrap(text, width) in src/wrap.js. Rules: 1) paragraphs are split by one or more blank lines (a line with only spaces or tabs is blank); 2) output paragraphs are joined by exactly one blank line (\"\\n\\n\"); 3) inside a paragraph, any run of spaces, tabs or single newlines is one space (single newlines are not kept); 4) greedy: put as many words on a line as fit, a line may be exactly width long; 5) a word longer than width starts on a new line and is cut into pieces of width characters; the last piece acts as a normal word, so next words can follow it on that line; 6) no line starts or ends with a space, no blank lines at the start or end, no trailing \"\\n\"; 7) empty or whitespace-only text gives \"\". Join lines with \"\\n\". Do not change other files. Then run: node --test test/*.test.js"
+    ],
+    "lazy": [
+      "wrap() breaks on real email text. Make it a proper word wrapper."
+    ]
+  }
+}

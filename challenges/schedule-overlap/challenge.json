@@ -1,0 +1,20 @@
+{
+  "title": "Schedule overlap",
+  "difficulty": "medium",
+  "category": "spec",
+  "skill": "Define the boundaries and the output shape",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite find_conflicts(meetings) in schedule.py. A meeting is a dict with id, room, start, end. Rules: 1) parse start and end (\"H:MM\" or \"HH:MM\", 24-hour) into minutes and compare numbers, not strings; 2) if end <= start, raise ValueError; 3) rooms are the same when room.strip().lower() is equal; 4) two meetings in the same room conflict when start_a < end_b and start_b < end_a, so touching (end == start) is not a conflict; 5) for each conflict add the tuple (min(id_a, id_b), max(id_a, id_b)), each pair once; 6) return sorted(pairs), a list of tuples; ids are strings and compare as strings (\"m10\" < \"m2\"). Keep the signature. Do not change booking.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "find_conflicts has bugs, please fix the room overlap check."
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title": "CSV reader",
+  "difficulty": "medium",
+  "category": "spec",
+  "skill": "Say what happens with short and long rows",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite parse_csv(text) in csv_reader.py. The first row is the header; each later row becomes a dict of header name -> field. Fields are split by commas. A field in double quotes can hold commas, newlines and doubled quotes (\"\" means one \"). Rows end with \\n or \\r\\n. A newline at the very end adds no row; empty text returns []. A row with fewer fields than the header gets \"\" for the missing ones. A row with more fields than the header raises ValueError. csv.reader(io.StringIO(text, newline=\"\")) is fine, but not DictReader's defaults. Only change csv_reader.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Make parse_csv handle real CSV files."
+    ]
+  }
+}

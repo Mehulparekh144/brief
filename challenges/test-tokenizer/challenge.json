@@ -1,0 +1,21 @@
+{
+  "title": "Test the tokenizer",
+  "difficulty": "medium",
+  "category": "testing",
+  "skill": "Show the test shape and the cases that matter",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 6,
+  "protected": [
+    "tests/test_smoke.py",
+    "tokenizer.py"
+  ],
+  "briefs": {
+    "good": [
+      "Create tests/test_tokenizer.py for tokenize() in tokenizer.py. Use unittest and start the file like tests/test_smoke.py (sys.path insert). Table format: CASES = [('', []), ('3.14', ['3.14']), ('rate_2', ['rate_2']), ('x2 _y', ['x2', '_y']), ('a <= 1', ['a', '<=', '1']), ('a>=b', ['a', '>=', 'b']), ('a == b != c', ['a', '==', 'b', '!=', 'c']), ('a+b', ['a', '+', 'b']), ('(1 - 2) * 3 / 4', ['(', '1', '-', '2', ')', '*', '3', '/', '4']), ('a < b > c = d', ['a', '<', 'b', '>', 'c', '=', 'd']), ('name != \"Bob Lee\"', ['name', '!=', '\"Bob Lee\"'])]. One test method: for text, tokens in CASES, with self.subTest(text=text), assertEqual(tokenize(text), tokens). Do not change tokenizer.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Write some tests for the tokenizer."
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title": "LRU cache",
+  "difficulty": "medium",
+  "category": "spec",
+  "skill": "Say what counts as a use",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 8,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "Fix the LRUCache class in src/lru.js so it is a real least-recently-used cache. Rules: 1) the constructor throws RangeError unless capacity is an integer >= 1 (0, -1, 1.5, NaN, \"3\", undefined all throw); 2) get(key) returns the value or undefined, and a hit makes the key most recently used; 3) set(key, value) adds or updates, and both make the key most recently used (delete then re-add in the Map); 4) updating an existing key never evicts; 5) adding a new key to a full cache first evicts the least recently used key; 6) set() returns this, so calls chain; 7) has(key) returns a boolean and does not change recency; 8) add a size getter. Do not change other files. Then run: node --test test/*.test.js"
+    ],
+    "lazy": [
+      "Fix the LRU cache, it evicts the wrong entries."
+    ]
+  }
+}

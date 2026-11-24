@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # Self-check for every challenge: the starting repo fails the full suite
 # (public + hidden tests) and the reference solution passes it.
+# Usage: bash scripts/check-challenges.sh [slug ...]   (no slug = every challenge)
 set -u
+export PYTHONDONTWRITEBYTECODE=1 # the solution is copied over the start in the same second; stale .pyc files would hide it
 cd "$(dirname "$0")/../challenges" || exit 1
 status=0
-for dir in */; do
-  slug=${dir%/}
+if [ $# -gt 0 ]; then slugs="$*"; else slugs=$(ls -d */ | tr -d /); fi
+for slug in $slugs; do
   [ -f "$slug/challenge.json" ] || continue
   cmd=$(node -p "require('./$slug/challenge.json').testCmd")
   tmp=$(mktemp -d)

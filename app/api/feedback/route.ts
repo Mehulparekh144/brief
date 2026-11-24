@@ -1,10 +1,13 @@
-import { apiUser } from "@/lib/auth.ts";
+import { apiUser, feedbackRateLimited, jsonBody } from "@/lib/auth.ts";
 import { db } from "@/lib/supabase.ts";
 
 export async function POST(req: Request) {
   const me = await apiUser();
   if (me instanceof Response) return me;
-  const body = await req.json().catch(() => ({}));
+  const body = await jsonBody(req);
+  if (body instanceof Response) return body;
+  const limited = await feedbackRateLimited(me.id);
+  if (limited) return limited;
   const rating = body.rating == null ? null : Number(body.rating);
   const text = typeof body.text === "string" ? body.text.trim().slice(0, 4000) : "";
   if (rating !== null && !(Number.isInteger(rating) && rating >= 1 && rating <= 5)) return Response.json({ error: "Rating must be 1 to 5." }, { status: 400 });

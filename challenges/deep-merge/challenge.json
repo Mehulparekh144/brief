@@ -1,0 +1,20 @@
+{
+  "title": "Deep merge",
+  "difficulty": "medium",
+  "category": "spec",
+  "skill": "Say what happens to each kind of value",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 8,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite merge(target, source) in src/merge.js. Rules: 1) return a new object and never change target or source at any depth (tests freeze them); 2) a plain object (prototype is Object.prototype) in source merges recursively into the plain object at the same key; if the target value is not a plain object, merge into {}; 3) an array in source replaces the target value, no concat; 4) a source key whose value is undefined is skipped at every depth, and is not added to the result; 5) null overwrites; 6) every plain object and array in the result is a new copy at every depth, also the parts copied from target (arrays copied item by item, recursively); 7) other values (Date, Map, class instances) are kept by reference, not cloned or merged; 8) anything else from source replaces the target value. Do not change other files. Then run: node --test test/*.test.js"
+    ],
+    "lazy": [
+      "merge() in the config loader has bugs. Make it a proper deep merge."
+    ]
+  }
+}

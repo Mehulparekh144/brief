@@ -24,7 +24,10 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body { background: var(--paper); color: var(--ink); font-family: var(--f-ui); font-size: 15px; line-height: 1.55; }
-a { color: inherit; text-decoration: underline; text-decoration-color: var(--hl-line); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+/* Links: clean by default. Underline only inside sentences, and on hover. */
+a { color: inherit; text-decoration: none; }
+a:hover, p a { text-decoration: underline; text-decoration-color: var(--hl-line); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.btn:hover, .topbar nav a:hover, .filter-tabs a:hover { text-decoration: none; }
 a:focus-visible, button:focus-visible, textarea:focus-visible, input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 h1, h2, h3, h4 { margin: 0; line-height: 1.2; text-wrap: balance; }
 p { margin: 0; }
@@ -71,6 +74,8 @@ textarea, input[type="text"] { width: 100%; font: 14px/1.5 var(--f-ui); color: v
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th { text-align: left; font-family: var(--f-num); font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); font-weight: 500; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
 td { padding: 10px 14px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+tbody tr:hover td { background: var(--sheet-2); }
+td a { font-weight: 500; }
 td.n, th.n { font-family: var(--f-num); font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 
 /* meter */
@@ -223,3 +228,11 @@ dialog.report::backdrop { background: rgb(15 18 21 / 0.45); }
 .kind:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
 select { font: 14px var(--f-ui); color: var(--ink); background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; }
 .notice.resume { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+
+/* filter tabs (admin reports) */
+.filter-tabs { display: flex; flex-wrap: wrap; align-items: end; border-bottom: 1px solid var(--line); }
+.filter-tabs a { padding: 8px 14px; margin-bottom: -1px; font-size: 13.5px; color: var(--muted); border-bottom: 2px solid transparent; }
+.filter-tabs a:hover { color: var(--ink); }
+.filter-tabs a[aria-current="page"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--hl-line); }
+.filter-tabs .spacer { flex: 1; }
+.filter-tabs a .num { font-size: 11px; margin-left: 4px; }

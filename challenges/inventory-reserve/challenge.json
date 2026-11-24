@@ -1,0 +1,20 @@
+{
+  "title": "Inventory reserve",
+  "difficulty": "medium",
+  "category": "bug-fix",
+  "skill": "Describe every symptom and the expected behavior",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Fix Inventory.reserve(sku, qty) in inventory/service.py and by_priority() in inventory/allocate.py. Rules: use warehouses with priority 1 first, then 2, and so on; with equal priority, sort by name A-Z (by_priority sorts with reverse=True now, which is wrong). Take as much as possible from each warehouse before the next. All or nothing: if the total stock of the sku is less than qty, raise OutOfStock and change no stock (today it raises after it already took stock). qty below 1 raises ValueError and changes nothing. Return [(warehouse name, units taken)] in the order used, only warehouses that gave units. Do not change other files. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Stock reservation is buggy. Fix it."
+    ]
+  }
+}

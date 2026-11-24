@@ -1,12 +1,22 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
+export const CATEGORIES = {
+  "bug-fix": "Bug fixing",
+  spec: "Build from a spec",
+  refactor: "Refactor and scope",
+  testing: "Testing",
+  security: "Security",
+} as const;
+export type Category = keyof typeof CATEGORIES;
+
 export type Par = { median: number; low: number; high: number; runs: number[] };
 
 export type Challenge = {
   slug: string;
   title: string;
   difficulty: "easy" | "medium" | "hard";
+  category: Category;
   skill: string;
   statement: string;
   /** Runs in the repo root. Exit code 0 means every test passed. */

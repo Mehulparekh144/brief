@@ -1,6 +1,7 @@
 {
   "title": "Late fees",
   "difficulty": "easy",
+  "category": "bug-fix",
   "skill": "Name the file and the symptom",
   "testCmd": "node --test --test-reporter=tap test/*.test.js",
   "tokenCap": 160000,

@@ -9,10 +9,14 @@ const env = (name: string) => {
   return v;
 };
 
+// Only the server talks to Supabase, so page scripts never need the auth cookie: keep it httpOnly.
+export const COOKIE_OPTIONS = { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/" };
+
 /** Signed-in user's client (cookies). Use only for auth calls. */
 export async function authClient() {
   const store = await cookies();
   return createServerClient(env("NEXT_PUBLIC_SUPABASE_URL"), env("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"), {
+    cookieOptions: COOKIE_OPTIONS,
     cookies: {
       getAll: () => store.getAll(),
       setAll: (list) => {

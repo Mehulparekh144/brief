@@ -1,0 +1,20 @@
+{
+  "title": "Dense rank",
+  "difficulty": "easy",
+  "category": "spec",
+  "skill": "Say how ties are ranked and ordered",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 6,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "Fix rank(players) in src/rank.js. Rules: 1) sort by score, highest first; 2) dense ranks: equal scores share a rank and the next score gets the next number (100, 90, 90, 80 -> 1, 2, 2, 3, not 1, 2, 2, 4); 3) equal scores are sorted by name A-Z ignoring case, compare name.toLowerCase() with < and >, not localeCompare; 4) names that are equal ignoring case keep input order (stable sort); 5) return a new array of { rank, name, score } with only those three fields. Do not change other files. Then run: node --test test/*.test.js"
+    ],
+    "lazy": [
+      "The leaderboard ranks are wrong when scores tie. Fix it."
+    ]
+  }
+}

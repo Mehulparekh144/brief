@@ -1,0 +1,20 @@
+{
+  "title": "Order state machine",
+  "difficulty": "hard",
+  "category": "spec",
+  "skill": "Hand over the whole table and every error",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "In orders/order.py add ALLOWED = {new: (paid, cancelled), paid: (packed, cancelled), packed: (shipped, cancelled), shipped: (delivered,), delivered: (), cancelled: ()}. Order.__init__ sets self.history = []. Add property is_final (no allowed moves) and transition(to): if to not in ALLOWED raise ValueError(f\"unknown state: {to}\"); if is_final raise InvalidTransition(f\"order {self.id} is {self.status} and cannot change\"); if to not in ALLOWED[status] raise InvalidTransition(f\"cannot move order {self.id} from {self.status} to {to}\"); else append the tuple (status, to) to history and set status. Make pay/pack/ship/deliver/cancel each just call self.transition(<state>). In orders/service.py: cancel_all wraps order.cancel() in try/except InvalidTransition and skips failures; ship_ready ships only status == \"packed\". Do not change tests/ or errors.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Turn Order into a proper state machine so invalid moves are rejected."
+    ]
+  }
+}

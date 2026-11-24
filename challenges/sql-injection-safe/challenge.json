@@ -1,0 +1,20 @@
+{
+  "title": "Injection-safe search",
+  "difficulty": "hard",
+  "category": "security",
+  "skill": "Name every input path and the exact escaping",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Fix SQL injection in users/store.py. find_by_email: use \"... WHERE email = ?\" with (email,). search_users(name): name = name.strip(); if empty return []; escape the text by replacing \\ with \\\\, then % with \\% and _ with \\_, add % at the end (prefix match); run \"SELECT id, name, email FROM users WHERE name LIKE ? ESCAPE '\\' ORDER BY name COLLATE NOCASE, id\" with that pattern as the only parameter; keep returning [dict(row) ...]. No user text may appear in any SQL string. Only change users/store.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "search_users is open to SQL injection. Fix it."
+    ]
+  }
+}

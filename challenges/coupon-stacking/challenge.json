@@ -1,0 +1,20 @@
+{
+  "title": "Coupon stacking",
+  "difficulty": "hard",
+  "category": "bug-fix",
+  "skill": "Spell out the order of operations",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "In src/coupons/apply.js, applyCoupons({ items, shipping }, coupons) applies coupons in list order, stacks every percent coupon, lets amounts go below 0, and takes shipping coupons off items. Rules, all in cents: use only the percent coupon with the highest value, applied first to items, discount = Math.round(items * value / 100); then subtract every fixed coupon from items; items never below 0, and extra fixed discount does not touch shipping; shipping coupons subtract only from shipping, never below 0; total = items + shipping; the list order must not change the result. Keep the return shape { items, shipping, total }. Only change that file. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "Coupon totals are wrong when people use more than one coupon. Fix it."
+    ]
+  }
+}

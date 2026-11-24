@@ -1,6 +1,7 @@
 {
   "title": "Test writer",
   "difficulty": "medium",
+  "category": "testing",
   "skill": "Show the agent the exact shape you want",
   "testCmd": "python3 -m unittest discover -s tests -v",
   "tokenCap": 160000,

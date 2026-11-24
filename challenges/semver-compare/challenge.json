@@ -1,0 +1,20 @@
+{
+  "title": "Semver compare",
+  "difficulty": "medium",
+  "category": "spec",
+  "skill": "Give the exact ordering rules",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite compare(a, b) in src/semver.js to follow semver 2.0 precedence. Rules: 1) return exactly -1, 0 or 1; 2) valid = optional lowercase \"v\", then MAJOR.MINOR.PATCH (digits), then optional \"-prerelease\" and optional \"+build\", both dot-separated identifiers of [0-9A-Za-z-]; 3) anything else throws TypeError with message `invalid version: <input>` (check a first, then b); 4) ignore build metadata; 5) compare MAJOR, MINOR, PATCH as numbers; 6) a prerelease is lower than the same version without one; 7) prerelease identifiers left to right: all-digit ones compare as numbers, text ones by plain ASCII code (\"Beta\" < \"alpha\", no localeCompare), a numeric one is lower than a text one, and if all shared ones are equal the longer list is greater. Do not change other files. Then run: node --test test/*.test.js"
+    ],
+    "lazy": [
+      "Make compare() in semver.js handle real semver versions."
+    ]
+  }
+}

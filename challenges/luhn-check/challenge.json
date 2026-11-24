@@ -1,0 +1,20 @@
+{
+  "title": "Luhn check",
+  "difficulty": "easy",
+  "category": "spec",
+  "skill": "Say which input is allowed",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 7,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "In src/card.js, rewrite validateCard(number) with these rules: 1) if number is not a string, return false, never throw; 2) remove the space character and \"-\" wherever they are; 3) after that, any character that is not 0-9 (also a tab or a newline) gives false; 4) there must be 13 to 19 digits; 5) Luhn check: from the rightmost digit, double every second digit, subtract 9 when the result is more than 9, and the sum must be a multiple of 10. Return true or false. Do not change other files. Then run: node --test test/*.test.js"
+    ],
+    "lazy": [
+      "Make validateCard actually validate card numbers."
+    ]
+  }
+}

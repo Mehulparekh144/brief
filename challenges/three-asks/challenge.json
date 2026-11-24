@@ -1,6 +1,7 @@
 {
   "title": "Three asks",
   "difficulty": "easy",
+  "category": "refactor",
   "skill": "Put all your asks in one message",
   "testCmd": "node --test --test-reporter=tap test/*.test.js",
   "tokenCap": 160000,

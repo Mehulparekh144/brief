@@ -38,4 +38,29 @@ export async function apiUser(): Promise<Me | Response> {
   return me;
 }
 
+/**
+ * Body of a state-changing API call. Requires Content-Type: application/json: a cross-site HTML form
+ * cannot send that without a CORS preflight, so this blocks CSRF on top of SameSite=Lax cookies.
+ */
+export async function jsonBody(req: Request): Promise<Record<string, unknown> | Response> {
+  if (!(req.headers.get("content-type") ?? "").includes("application/json")) {
+    return Response.json({ error: "Send JSON." }, { status: 415 });
+  }
+  const text = await req.text();
+  let body: unknown = {}; // an empty body is fine for actions like stop and submit
+  try {
+    if (text.trim()) body = JSON.parse(text);
+  } catch {
+    body = null;
+  }
+  return body && typeof body === "object" && !Array.isArray(body) ? (body as Record<string, unknown>) : Response.json({ error: "Bad request body." }, { status: 400 });
+}
+
+/** At most `limit` feedback rows (ratings, notes, reports) per user per hour. Counted in the DB: works across processes. */
+export async function feedbackRateLimited(userId: string, limit = 20): Promise<Response | null> {
+  const since = new Date(Date.now() - 3600_000).toISOString();
+  const { count } = await db().from("feedback").select("id", { count: "exact", head: true }).eq("user_id", userId).gte("created_at", since);
+  return (count ?? 0) >= limit ? Response.json({ error: "Too many reports in the last hour. Try again later." }, { status: 429 }) : null;
+}
+
 export const siteUrl = (requestOrigin: string) => process.env.SITE_URL || requestOrigin;

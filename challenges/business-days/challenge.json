@@ -1,0 +1,20 @@
+{
+  "title": "Business days",
+  "difficulty": "medium",
+  "category": "spec",
+  "skill": "State the edge cases the agent cannot guess",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite add_business_days(start, n, holidays) in workdays.py. A business day is Monday to Friday and not in holidays. Step one calendar day at a time; the start day never counts. n > 0 goes forward n business days. n < 0 goes back abs(n) business days. From a non-business day count as usual: Saturday + 1 is Monday, Sunday - 1 is Friday. n == 0 returns start if it is a business day, else the next business day after it. Only change workdays.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Fix add_business_days so it works for all cases."
+    ]
+  }
+}

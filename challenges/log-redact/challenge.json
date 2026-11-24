@@ -1,0 +1,20 @@
+{
+  "title": "Log redact",
+  "difficulty": "medium",
+  "category": "security",
+  "skill": "List every secret and the exact mask",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite redact(record) in logkit/redact.py as a recursive function that returns a new object and never mutates its input. Dict: for each key, if key.lower() is exactly one of password, token, secret, api_key, the value becomes \"***\" (any type); otherwise recurse. List: recurse into each item. String: first replace re (?i)\\b(bearer\\s+)\\S+ with \\1*** (so 'bearer abc' -> 'bearer ***'), then mask emails: keep the first character of the local part and the domain, 'ana.lee@example.com' -> 'a***@example.com'. Other values (numbers, bool, None) and all keys stay as they are. Only change logkit/redact.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Our logs leak passwords and tokens. Make redact() safer."
+    ]
+  }
+}

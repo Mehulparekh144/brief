@@ -1,6 +1,7 @@
 {
   "title": "Wrong turn",
   "difficulty": "hard",
+  "category": "bug-fix",
   "skill": "Do not repeat a wrong guess; give the agent the real clue",
   "testCmd": "python3 -m unittest discover -s tests -v",
   "tokenCap": 160000,
