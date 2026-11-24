@@ -8,6 +8,9 @@ export async function GET(req: NextRequest) {
     provider: "github",
     options: { redirectTo: `${siteUrl(req.nextUrl.origin)}/auth/callback` },
   });
-  if (error || !data.url) return Response.json({ error: error?.message ?? "Sign-in failed." }, { status: 500 });
+  if (error || !data.url) {
+    console.error("login:", error?.message);
+    return Response.json({ error: "Sign-in failed. Try again." }, { status: 500 });
+  }
   return Response.redirect(data.url, 302);
 }

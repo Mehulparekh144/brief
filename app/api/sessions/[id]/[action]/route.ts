@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { apiUser } from "@/lib/auth.ts";
+import { apiUser, jsonBody } from "@/lib/auth.ts";
 import { type Ev, getLive, listFiles, publicTests, readFile, sendMessage, stopAgent, submitSession, UserError } from "@/lib/live.ts";
 
 type Ctx = { params: Promise<{ id: string; action: string }> };
@@ -79,11 +79,13 @@ export async function GET(req: NextRequest, { params }: Ctx) {
 export async function POST(req: NextRequest, { params }: Ctx) {
   const me = await apiUser();
   if (me instanceof Response) return me;
+  const body = await jsonBody(req);
+  if (body instanceof Response) return body;
   const { id, action } = await params;
   const l = getLive(id, me.id);
   if (!l) return gone();
   try {
-    if (action === "messages") sendMessage(l, String((await req.json().catch(() => ({}))).text ?? ""));
+    if (action === "messages") sendMessage(l, String(body.text ?? ""));
     else if (action === "stop") stopAgent(l);
     else if (action === "tests") await publicTests(l);
     else if (action === "submit") void submitSession(l);

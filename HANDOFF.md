@@ -43,6 +43,15 @@ Every live challenge passed the 2× rule on Haiku 5.5; par values are in each `c
 
 Measured cost: agent ≈ $0.001 per session, coach ≈ $0.01–0.02. The sandbox is now the main cost.
 
+## Security review (2026-11-23)
+Checked against the security-review checklist (github.com/WorldFlowAI/everything-claude-code, skills/security-review).
+- Fixed: `_migrations` had RLS off and full anon grants (readable and writable with the public key) → migration 004.
+- Added: httpOnly auth cookies; CSP, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, HSTS (prod) in `next.config.ts`;
+  JSON-only state-changing API calls (`jsonBody`, CSRF defense on top of SameSite=Lax); 20 reports/ratings per user per hour; Dependabot.
+- Already fine: no secrets in code or git history, `npm audit` clean, Supabase query builder only (no raw SQL), React escaping
+  (one `dangerouslySetInnerHTML`, on highlight.js output, which escapes), ownership and admin checks on every route, generic errors.
+- Kept SameSite=Lax (not Strict): Strict drops the session when users arrive from another site.
+
 ## Key decisions and why
 - Agent loop on our server; only tools run in the sandbox (no keys or internet inside). No LiteLLM.
 - Manual loop instead of the SDK tool runner: cap checks before each call and per-message token counts.
@@ -55,6 +64,8 @@ Measured cost: agent ≈ $0.001 per session, coach ≈ $0.01–0.02. The sandbox
 - Coach on Claude Opus 5.5 with `fallbacks: "default"` (server-side refusal fallback, beta `server-side-fallback-2026-07-01`).
 
 ## Gotchas
+- If you add a third-party script, image or API host, add it to the CSP in `next.config.ts`, or the browser blocks it.
+- New tables need `enable row level security` in their migration (the public key can reach every table in `public`).
 - Calibrate many challenges from bash, not zsh: zsh does not split `$VAR` into words (`bash -c 'npm run calibrate -- $NEW'`).
 - A good brief that fails calibration usually means the statement is ambiguous (see `amortization`): fix the statement, not the tests.
 - Links: no underline by default (`a:hover, p a` only). Use `.filter-tabs` for tab bars, not `pill` links.

@@ -1,10 +1,12 @@
-import { apiUser } from "@/lib/auth.ts";
+import { apiUser, jsonBody } from "@/lib/auth.ts";
 import { startSession, UserError } from "@/lib/live.ts";
 
 export async function POST(req: Request) {
   const me = await apiUser();
   if (me instanceof Response) return me;
-  const { challenge } = await req.json().catch(() => ({}));
+  const body = await jsonBody(req);
+  if (body instanceof Response) return body;
+  const { challenge } = body;
   try {
     return Response.json({ id: await startSession(me.id, String(challenge ?? ""), me.admin) });
   } catch (e) {

@@ -1,4 +1,4 @@
-import { apiUser } from "@/lib/auth.ts";
+import { apiUser, feedbackRateLimited, jsonBody } from "@/lib/auth.ts";
 import { db } from "@/lib/supabase.ts";
 import { loadChallenge } from "@/src/challenge.ts";
 
@@ -22,8 +22,11 @@ export async function GET() {
 export async function POST(req: Request) {
   const me = await apiUser();
   if (me instanceof Response) return me;
-  const b = await req.json().catch(() => ({}));
-  const kind = KINDS.includes(b.kind) ? b.kind : null;
+  const b = await jsonBody(req);
+  if (b instanceof Response) return b;
+  const limited = await feedbackRateLimited(me.id);
+  if (limited) return limited;
+  const kind = typeof b.kind === "string" && KINDS.includes(b.kind) ? b.kind : null;
   const title = typeof b.title === "string" ? b.title.trim().slice(0, 140) : "";
   const text = typeof b.details === "string" ? b.details.trim().slice(0, 8000) : "";
   if (!kind) return Response.json({ error: "Choose a type." }, { status: 400 });
@@ -33,7 +36,7 @@ export async function POST(req: Request) {
     const { data } = await db().from("sessions").select("user_id").eq("id", sessionId).maybeSingle();
     if (data?.user_id !== me.id) sessionId = null; // only your own sessions can be attached
   }
-  const ctx = b.context && typeof b.context === "object" ? b.context : {};
+  const ctx = (b.context && typeof b.context === "object" ? b.context : {}) as Record<string, unknown>;
   const context = {
     page: String(ctx.page ?? "").slice(0, 300),
     userAgent: String(req.headers.get("user-agent") ?? "").slice(0, 300),

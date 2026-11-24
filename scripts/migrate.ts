@@ -8,6 +8,7 @@ const client = new pg.Client({ connectionString: process.env.DATABASE_URL, ssl: 
 await client.connect();
 try {
   await client.query("create table if not exists public._migrations (name text primary key, applied_at timestamptz default now())");
+  await client.query("alter table public._migrations enable row level security"); // never readable with the public key
   const done = new Set((await client.query("select name from public._migrations")).rows.map((r) => r.name));
   for (const name of readdirSync(dir).filter((f) => f.endsWith(".sql")).sort()) {
     if (done.has(name)) continue;

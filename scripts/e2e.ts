@@ -45,6 +45,11 @@ for (const p of ["/", "/challenges", "/me"]) {
 }
 step("pages load: /, /challenges, /me");
 
+// CSRF guard: a cross-site HTML form can only send text/plain or form bodies. State changes need JSON.
+const formPost = await call("/api/sessions", { method: "POST", headers: { "content-type": "text/plain" }, body: JSON.stringify({ challenge: "late-fees" }) });
+assert.equal(formPost.status, 415, "a non-JSON POST must be refused");
+step("csrf guard: text/plain POST refused (415)");
+
 // 3. Start a session.
 const started = await call("/api/sessions", { method: "POST", body: JSON.stringify({ challenge: "late-fees" }) });
 const { id, error } = await started.json();
