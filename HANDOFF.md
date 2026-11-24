@@ -1,6 +1,6 @@
 # HANDOFF — Brieflab (agent practice platform)
 
-Last updated: 2026-11-22
+Last updated: 2026-11-23
 
 - Plan (scope, design, brand, costs, timeline): https://claude.ai/artifact/HTejiT3ahANGfuASqt7b2J
 - Repo: https://github.com/Mehulparekh144/brief (private). Work lands as one PR per task.
@@ -22,7 +22,14 @@ Last updated: 2026-11-22
 | 8 challenges, all live | `challenges/*` |
 | Tests: challenge self-check, e2e smoke test | `scripts/check-challenges.sh`, `scripts/e2e.ts` |
 
-## Calibration (Haiku 5.5, harness v1)
+## Challenges (2026-11-23)
+58 challenges: 56 live, 2 drafts (`cookie-parse`, `word-wrap`: a lazy brief also passes, 1.6–1.7× par).
+Categories (`category` in challenge.json, tabs on Practice): bug-fix 15, spec 24, refactor 6, testing 6, security 7. Difficulty: easy 14, medium 34, hard 10.
+Every live challenge passed the 2× rule on Haiku 5.5; par values are in each `challenges/<slug>/par.json`.
+50 were added on 2026-11-23 by 5 parallel writers, then checked with `check-challenges.sh` and calibrated (about $0.30).
+`amortization` needed exact rounding points in the statement: "round every money value" was ambiguous.
+
+## Calibration of the first 8 (Haiku 5.5, harness v1)
 | Challenge | Level | Par | Lazy | Rule |
 |---|---|---|---|---|
 | late-fees | easy | 7,685 | 2.1× | pass |
@@ -48,6 +55,8 @@ Measured cost: agent ≈ $0.001 per session, coach ≈ $0.01–0.02. The sandbox
 - Coach on Claude Opus 5.5 with `fallbacks: "default"` (server-side refusal fallback, beta `server-side-fallback-2026-07-01`).
 
 ## Gotchas
+- Calibrate many challenges from bash, not zsh: zsh does not split `$VAR` into words (`bash -c 'npm run calibrate -- $NEW'`).
+- A good brief that fails calibration usually means the statement is ambiguous (see `amortization`): fix the statement, not the tests.
 - Links: no underline by default (`a:hover, p a` only). Use `.filter-tabs` for tab bars, not `pill` links.
 - `npm run e2e` deletes the e2e user's sessions and feedback, so test data stays out of Admin → Reports.
 - `next dev` serves pages, server actions and API routes from **separate processes**; `next start` uses one. Never share in-memory state between a page and an API route.

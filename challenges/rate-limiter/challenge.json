@@ -1,0 +1,20 @@
+{
+  "title": "Rate limiter",
+  "difficulty": "medium",
+  "category": "bug-fix",
+  "skill": "State the units and the limits",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "In src/limits/bucket.js, createBucket({ capacity, refillPerSec, now }) refill() adds (t - last) * refillPerSec, but now() returns ms and refillPerSec is per second, so it refills 1000x too fast. It also has no cap, and allow() lets a request through with less than one token. Rules: add ((t - last) / 1000) * refillPerSec; cap tokens at capacity; allow() takes one token and returns true only when tokens >= 1, else returns false and takes nothing. Keep part tokens so small waits add up. Only change that file. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "The rate limiter lets too many requests through. Fix it."
+    ]
+  }
+}

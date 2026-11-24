@@ -1,0 +1,20 @@
+{
+  "title": "UTC daily report",
+  "difficulty": "medium",
+  "category": "bug-fix",
+  "skill": "List every rule the report must follow",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "In src/reports/daily.js, dailyRevenue(orders) has three bugs. 1) It takes the day with createdAt.slice(0, 10), which is the date in the order's own offset. Group by the UTC date instead with utcDate() from src/dates/utc.js: \"2026-03-01T23:30:00-05:00\" belongs to 2026-03-02. 2) It sums Math.trunc(parseFloat(amount) * 100), which loses cents (\"19.99\" gives 1998). Use toCents() from src/money/cents.js. 3) It returns days in input order. Sort rows by date, oldest first. Keep the row shape { date, cents, orders }. Only change that file. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "The daily revenue report is wrong. Fix it."
+    ]
+  }
+}

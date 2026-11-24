@@ -1,0 +1,20 @@
+{
+  "title": "Deprecate an alias",
+  "difficulty": "medium",
+  "category": "refactor",
+  "skill": "Give the exact message and where it must point",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "In dates/parsing.py, rename parse_date to parse_iso_date (same body). Add a wrapper def parse_date(text) that calls warnings.warn(\"parse_date() is deprecated; use parse_iso_date()\", DeprecationWarning, stacklevel=2) and returns parse_iso_date(text). In dates/billing.py and dates/reports.py, import and call parse_iso_date instead (the text parse_date must not appear there). In dates/__init__.py, export both names in the import and __all__. Do not change tests/. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Rename parse_date to parse_iso_date and deprecate the old name."
+    ]
+  }
+}

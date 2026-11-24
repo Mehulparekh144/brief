@@ -1,0 +1,20 @@
+{
+  "title": "CIDR allowlist",
+  "difficulty": "medium",
+  "category": "security",
+  "skill": "State what must be rejected, not only what must pass",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "In allowlist.py, rewrite load_allowlist(lines) and is_allowed(ip, allowlist) with the ipaddress module. load_allowlist: strip each line; skip empty lines and lines that start with \"#\"; parse every other line with ipaddress.IPv4Network (strict, so host bits set like \"10.0.0.1/8\" raise; a bare address is a /32); IPv6, bad prefixes and extra text raise ValueError right away; a prefix shorter than /8 (including 0.0.0.0/0) raises ValueError as too broad. is_allowed: never raises; return False when ip is not a str (an int or bytes too), or when ipaddress.IPv4Address(ip) fails (spaces, leading zeros, \"/32\", IPv6 such as \"::ffff:10.0.0.1\"); else True only if the address is in one of the networks. An empty allowlist allows nothing. Keep both names and arguments. Do not change app.py or allowlist.txt. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "The IP allowlist check is insecure, fix it."
+    ]
+  }
+}

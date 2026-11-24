@@ -1,0 +1,20 @@
+{
+  "title": "Pagination offset",
+  "difficulty": "easy",
+  "category": "bug-fix",
+  "skill": "Name the file and state the exact paging rules",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 8,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "In src/lib/paginate.js, paginate(items, page, size) uses page * size as the offset, so page 1 returns the second page. Pages are 1-based. Rules: start at (page - 1) * size; the last page can be partial; a page past the end returns items [] and keeps the requested page number (remove the clamp to the last page); totalPages = Math.ceil(total / size). Keep the return shape { items, page, size, total, totalPages }. Only change that file. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "Pagination on the posts list is broken. Fix it."
+    ]
+  }
+}

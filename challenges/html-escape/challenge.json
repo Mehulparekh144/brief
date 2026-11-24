@@ -1,0 +1,20 @@
+{
+  "title": "HTML escape",
+  "difficulty": "hard",
+  "category": "security",
+  "skill": "Give the full escape table and the raw-HTML rule",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "Fix the template engine in src/template. In escape.js, escapeHtml() escapes only < and >; make it turn & < > \" ' into &amp; &lt; &gt; &quot; &#39; (& first, no double work). In render.js, change render(template, data) to render(template, data, { allowRaw = [] } = {}) and: escape {{key}}; insert {{{key}}} raw only when key is in allowRaw, else escape it like {{key}}; render undefined and null as \"\", other values with String() so 0 is \"0\"; handle {{{ }}} and {{ }} in one regex pass so an inserted value is never scanned again for {{name}}. Do not change src/pages or src/markdown.js. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "Fix the XSS bug in the search page."
+    ]
+  }
+}

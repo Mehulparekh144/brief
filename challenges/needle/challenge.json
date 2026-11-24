@@ -1,6 +1,7 @@
 {
   "title": "Needle",
   "difficulty": "medium",
+  "category": "bug-fix",
   "skill": "Read the code first, then point the agent at it",
   "testCmd": "node --test --test-reporter=tap test/*.test.js",
   "tokenCap": 160000,

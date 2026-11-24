@@ -1,0 +1,20 @@
+{
+  "title": "Emitter once",
+  "difficulty": "easy",
+  "category": "bug-fix",
+  "skill": "Name the class and every listener rule",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "In src/events/emitter.js, class Emitter has three bugs. emit() loops over the live listener array, so a listener that removes itself (or a once() listener) makes the next one skip. once() calls fn before it removes itself, so a re-emit inside fn runs it twice. off(event, fn) cannot remove a once() listener because only the wrapper is stored. Rules: emit() calls a copy of the list taken when emit starts, in order (a listener removed during emit still runs this time); once() removes the wrapper first, then calls fn, and stores fn on the wrapper; off() also matches that stored fn. Only change that file. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "Some event listeners don't fire. Fix the emitter."
+    ]
+  }
+}

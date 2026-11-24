@@ -1,0 +1,20 @@
+{
+  "title": "Grade curve",
+  "difficulty": "easy",
+  "category": "bug-fix",
+  "skill": "Give the agent the reference table",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 8,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Fix letter() in grades.py. Two bugs: 1) round() is banker's rounding (92.5 -> 92); round half up to a whole number instead (92.5 -> 93, 92.49 -> 92), for example with math.floor(score + 0.5). 2) The B+ cutoff is 88; it must be 87. Correct cutoffs: A 93, A- 90, B+ 87, B 83, B- 80, C+ 77, C 73, C- 70, D 60, below 60 F. Keep the ValueError for scores outside 0-100. Only change grades.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Some students get the wrong letter grade. Fix it."
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+# minute hour day month weekday  job
+*/15     *    *   *     *        refresh-cache
+0        3    *   *     *        backup-db
+0,30     9-17 *   *     *        sync-crm
+45       23   *   *     *        rotate-logs

@@ -1,0 +1,20 @@
+{
+  "title": "Config messages",
+  "difficulty": "medium",
+  "category": "spec",
+  "skill": "Give exact output strings, not their gist",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite validate(config) in appconfig/validate.py to return a list of \"<key>: <problem>\" strings, at most one per key, sorted by key; [] if valid. Problems: missing host or port -> \"is required\"; key not in host/port/debug/workers/log_level -> \"unknown setting\"; host not a str or empty after strip -> \"must be a non-empty string\"; port not an int (bool is not an int) in 1..65535 -> \"must be an integer between 1 and 65535\"; debug not a bool -> \"must be true or false\"; workers not an int (not bool) in 1..64 -> \"must be an integer between 1 and 64\"; log_level not exactly one of debug, info, warning, error -> \"must be one of debug, info, warning, error\". Use LOG_LEVELS and REQUIRED from appconfig/schema.py. Do not change loader.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Make validate() report all config errors, not just the first ones."
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Roman numerals",
+  "difficulty": "easy",
+  "category": "spec",
+  "skill": "Name the error for each bad input",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "In src/roman.js, make toRoman(n) and fromRoman(s) strict. toRoman: if n is not an integer (string, NaN, 3.5, Infinity, null) throw TypeError; check that first; then an integer below 1 or above 3999 throws RangeError; keep the subtractive forms (IV, IX, XL, XC, CD, CM). fromRoman: a non-string throws TypeError; accept only the exact string toRoman returns for some n in 1-3999, uppercase only; anything else (\"IIII\", \"VV\", \"IC\", \"MMMM\", \"iv\", \"\") throws TypeError, not RangeError. Do not change other files. Then run: node --test test/*.test.js"
+    ],
+    "lazy": [
+      "Add input validation to the roman numeral functions."
+    ]
+  }
+}

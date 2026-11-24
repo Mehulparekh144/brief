@@ -1,0 +1,20 @@
+{
+  "title": "Feature flags",
+  "difficulty": "medium",
+  "category": "bug-fix",
+  "skill": "State the override and the rollout rule",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "In src/flags/isEnabled.js, isEnabled(flag, userId, env) returns bucket(flag, userId) >= rollout, which is the wrong way round (a 100% flag is off for everyone), and it ignores FLAG_<NAME>=off. Rules: read env[envName(flag)]; \"on\" returns true, \"off\" returns false, any other value is ignored; otherwise return bucket(flag, userId) < rollout. A flag not in config.js stays false. Do not change config.js, hash.js, env.js or the bucket() formula. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "Feature flag rollouts are wrong. Fix it."
+    ]
+  }
+}

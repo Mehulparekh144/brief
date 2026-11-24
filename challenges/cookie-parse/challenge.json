@@ -1,0 +1,21 @@
+{
+  "draft": true,
+  "title": "Cookie parse",
+  "difficulty": "hard",
+  "category": "spec",
+  "skill": "Give the parsing steps in order",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite parseCookies(header) in src/cookies.js. Steps: 1) a header that is not a string gives {}; 2) split on \";\"; 3) skip a pair without \"=\"; 4) name = text before the first \"=\", value = all text after it; 5) trim name and value; skip an empty name; an empty value is fine; 6) names are case-sensitive and never decoded; 7) first occurrence wins; check with Object.hasOwn, because names like \"toString\" and \"constructor\" are normal names; 8) if the value has at least 2 characters and starts and ends with a double quote, remove those two quotes; 9) then decodeURIComponent the value; if it throws, keep the value from step 8; \"+\" stays \"+\", and quotes that come from decoding stay. Do not change other files. Then run: node --test test/*.test.js"
+    ],
+    "lazy": [
+      "parseCookies breaks on real Cookie headers. Make it robust."
+    ]
+  }
+}

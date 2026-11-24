@@ -1,0 +1,6 @@
+# Office VPN
+10.20.0.0/16
+# CI runners
+192.168.40.0/24
+# On-call laptop
+203.0.113.7

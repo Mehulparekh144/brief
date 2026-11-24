@@ -1,0 +1,20 @@
+{
+  "title": "Phone format",
+  "difficulty": "easy",
+  "category": "spec",
+  "skill": "List every input rule, including what is invalid",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite to_e164(raw, default_country=\"US\") in phone.py. 1) Remove spaces and the characters - . ( ). Any other non-digit character raises ValueError. A '+' is allowed only as the first character. 2) Then a leading '00' means '+'. 3) With '+': keep the digits as they are; there must be 8 to 15 digits, else ValueError. 4) Without '+': a default_country other than 'US' raises ValueError; 10 digits gives '+1' + digits; 11 digits that start with 1 gives '+' + digits; anything else raises ValueError. Only change phone.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Make to_e164 handle all phone number formats properly."
+    ]
+  }
+}

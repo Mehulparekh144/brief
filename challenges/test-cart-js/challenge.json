@@ -1,0 +1,20 @@
+{
+  "title": "Test the cart (JS)",
+  "difficulty": "medium",
+  "category": "testing",
+  "skill": "Give the team's test layout and the cases",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 5,
+  "protected": [
+    "test/smoke.test.js"
+  ],
+  "briefs": {
+    "good": [
+      "Create test/cart.test.js for src/cart.js. Use node:test (describe, test) and node:assert/strict. Exactly one describe per function, with these names: describe(\"addItem()\"), describe(\"removeItem()\"), describe(\"applyCoupon()\"), describe(\"total()\"); put each function's tests in its block. Start from an empty cart { items: [], coupon: null }. Cases: addItem the same sku with qty 2 then 3 gives one item with qty 5; addItem with qty 0 throws RangeError; removeItem on a cart with mug and tea removes only mug; applyCoupon(cart, \"  save10 \").coupon is \"SAVE10\"; applyCoupon with \"FREE\" throws; total of one item at 1005 cents with SAVE10 is 904; total of one item at 300 cents with FIVEOFF is 0. Do not change src/cart.js or test/smoke.test.js. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "Add tests for the cart module."
+    ]
+  }
+}

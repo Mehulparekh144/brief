@@ -39,7 +39,7 @@ flowchart LR
 
 ## Add a challenge
 
-Create `challenges/<slug>/` with `challenge.json`, `statement.md`, `repo/`, `hidden/` and `solution/`. Run `npm run check`, then `npm run calibrate -- <slug>`. Ship it only if it passes the 2× rule; otherwise set `"draft": true`.
+Create `challenges/<slug>/` with `challenge.json`, `statement.md`, `repo/`, `hidden/` and `solution/`. `challenge.json` sets `difficulty` (easy, medium, hard) and `category` (bug-fix, spec, refactor, testing, security). Run `bash scripts/check-challenges.sh <slug>`, then `npm run calibrate -- <slug>`. Ship it only if it passes the 2× rule; otherwise set `"draft": true`.
 
 ## Deploy (Railway)
 

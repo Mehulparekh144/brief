@@ -1,0 +1,20 @@
+{
+  "title": "Invoice numbering",
+  "difficulty": "easy",
+  "category": "bug-fix",
+  "skill": "Name both symptoms and the rule behind them",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 7,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "Fix nextInvoiceNumber(last, date) in src/invoices/numbering.js. Parse last with /^INV-(\\d{4})-(\\d+)$/ instead of last.slice(-4). Rules: format INV-YYYY-NNNN where YYYY is date.getUTCFullYear(); the counter is last's counter + 1; if last is null or its year is not the year of date, the counter is 1; pad the counter to at least 4 digits with padStart(4, \"0\") and never cut it, so INV-2026-9999 is followed by INV-2026-10000, then INV-2026-10001. Do not change other files. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "Invoice numbers are wrong sometimes, fix it."
+    ]
+  }
+}

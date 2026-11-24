@@ -6,16 +6,19 @@ import { byDifficulty, fmt, PAR_TEXT, parRange, staleBefore } from "@/lib/format
 import Link from "next/link";
 
 import { db } from "@/lib/supabase.ts";
-import { listChallenges, loadChallenge } from "@/src/challenge.ts";
+import { CATEGORIES, type Category, listChallenges, loadChallenge } from "@/src/challenge.ts";
 
 export const dynamic = "force-dynamic";
 
-export default async function ChallengesPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default async function ChallengesPage({ searchParams }: { searchParams: Promise<{ error?: string; category?: string }> }) {
   const me = await requireUser();
-  const { error } = await searchParams;
+  const { error, category } = await searchParams;
+  const active = category && category in CATEGORIES ? (category as Category) : null;
   const { data: open } = await db().from("sessions").select("id, challenge").eq("user_id", me.id).eq("status", "active").gte("heartbeat_at", staleBefore()).order("started_at", { ascending: false }).limit(1);
   const running = open?.[0] ? { id: open[0].id, title: loadChallenge(open[0].challenge).title } : null;
-  const challenges = listChallenges().map(loadChallenge).sort(byDifficulty);
+  const all = listChallenges().map(loadChallenge).sort(byDifficulty);
+  const challenges = active ? all.filter((c) => c.category === active) : all;
+  const count = (c: Category) => all.filter((x) => x.category === c).length;
   const { data: rows } = await db().from("sessions").select("challenge, tokens_total, passed").eq("user_id", me.id).eq("status", "submitted");
   const best = new Map<string, { best: number | null; tries: number }>();
   for (const r of rows ?? []) {
@@ -49,6 +52,16 @@ export default async function ChallengesPage({ searchParams }: { searchParams: P
           </div>
         )}
         {error && <p className="notice bad">{error}</p>}
+        <nav className="filter-tabs" aria-label="Categories">
+          <Link href="/challenges" aria-current={!active ? "page" : undefined}>
+            All <span className="muted num">{all.length}</span>
+          </Link>
+          {(Object.keys(CATEGORIES) as Category[]).map((c) => (
+            <Link key={c} href={`/challenges?category=${c}`} aria-current={active === c ? "page" : undefined}>
+              {CATEGORIES[c]} <span className="muted num">{count(c)}</span>
+            </Link>
+          ))}
+        </nav>
         <div className="ch-list">
           {challenges.map((ch) => {
             const b = best.get(ch.slug);
@@ -58,6 +71,7 @@ export default async function ChallengesPage({ searchParams }: { searchParams: P
                   <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                     <h3>{ch.title}</h3>
                     <DifficultyChip level={ch.difficulty} />
+                    <span className="pill">{CATEGORIES[ch.category]}</span>
                   </div>
                   <p className="muted">{ch.statement.split("\n")[0]}</p>
                   <span className="label">Skill: {ch.skill}</span>

@@ -1,0 +1,16 @@
+{
+  "median": 10536,
+  "low": 10505,
+  "high": 15167,
+  "runs": [
+    15167,
+    10536,
+    10505
+  ],
+  "model": "claude-haiku-5-5",
+  "harnessVersion": 1,
+  "lazyMedian": 14526,
+  "lazyFails": 3,
+  "ruleOk": true,
+  "date": "2026-11-24"
+}

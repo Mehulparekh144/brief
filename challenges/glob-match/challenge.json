@@ -1,0 +1,20 @@
+{
+  "title": "Glob match",
+  "difficulty": "hard",
+  "category": "spec",
+  "skill": "Spell out every edge case of the spec",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite match(pattern, path) in src/glob.js. Split pattern and path on \"/\" and match segment by segment. Rules: 1) the whole path must match; 2) \"*\" matches any run of characters inside one segment, also none, never \"/\"; 3) \"?\" matches exactly one character, never \"/\"; 4) a segment that is exactly \"**\" matches zero or more segments, so \"a/**/b\" matches \"a/b\" and \"a/x/y/b\", and \"a/**\" also matches \"a\"; 5) \"**\" inside a segment, like \"**.js\", acts as \"*\"; 6) a backslash makes the next character literal: \\* matches \"*\", \\? matches \"?\", \\\\ matches \"\\\", and \\*\\* as a segment is not a globstar; 7) every other character is literal, so escape regex characters like . + ( [ ^ $ |. Keep the signature and return a boolean. Do not change other files and do not add packages. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "Fix the glob matcher so it handles ** and escapes."
+    ]
+  }
+}

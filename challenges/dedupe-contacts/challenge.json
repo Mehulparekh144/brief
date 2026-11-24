@@ -1,0 +1,20 @@
+{
+  "title": "Dedupe contacts",
+  "difficulty": "medium",
+  "category": "spec",
+  "skill": "Spell out what counts as the same",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Two changes. 1) contacts/emails.py normalize_email: strip and lowercase; if the domain is gmail.com or googlemail.com, cut the local part at the first '+', remove all dots from it, and use domain gmail.com; other domains only strip+lowercase (keep dots and +tags). 2) contacts/dedupe.py dedupe(contacts): group by normalized email, output in order of first appearance, never mutate the input. Merged contact = {name: first non-empty name, email: normalized email, phones: all phones in order first seen, skipping a phone whose digits-only form (re.sub(r'\\D','',p)) was already seen}. A contact whose email is empty after strip is never merged: append a copy as is. Do not change other files. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "dedupe() misses duplicates. Make it merge contacts that are the same person."
+    ]
+  }
+}

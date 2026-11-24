@@ -1,0 +1,20 @@
+{
+  "title": "Password policy",
+  "difficulty": "medium",
+  "category": "security",
+  "skill": "Give exact codes, order and edge cases",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite check(password, username) in policy.py. It returns a list of failed rule codes in this exact order (empty list = accepted): LENGTH if fewer than 12 characters; UPPER if no A-Z; LOWER if no a-z; DIGIT if no 0-9; SYMBOL if no character other than A-Z, a-z, 0-9 (a space counts as a symbol); CONTAINS_USERNAME if the password contains the username, ignoring case (an empty username never matches); COMMON if the password, ignoring case, is a line in data/common_passwords.txt (skip blank lines and lines that start with #; load the file relative to policy.py). Only change policy.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Make the password check in policy.py stronger."
+    ]
+  }
+}

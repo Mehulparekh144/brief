@@ -1,0 +1,20 @@
+{
+  "title": "Retry backoff",
+  "difficulty": "medium",
+  "category": "bug-fix",
+  "skill": "Give the exact attempt and delay schedule",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "In src/lib/retry.js, retry(fn, { retries, baseMs, maxMs, sleep }) calls fn only retries times, waits baseMs * (attempt + 1), sleeps after the last failure, and throws a new \"gave up\" error. Rules: call fn up to retries + 1 times; before retry i (i = 0, 1, 2, ...) await sleep(Math.min(baseMs * 2 ** i, maxMs)); no sleep after the last failure; return the first success; if all calls fail, throw the last error object itself (no wrapper). Wait only through the sleep option. Only change that file. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "The retry logic in the weather client is off. Fix it."
+    ]
+  }
+}

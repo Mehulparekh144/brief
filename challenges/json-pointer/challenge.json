@@ -1,0 +1,20 @@
+{
+  "title": "JSON pointer",
+  "difficulty": "medium",
+  "category": "spec",
+  "skill": "Quote the standard's edge cases, not just its name",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 8,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite get(doc, pointer) in src/pointer.js (RFC 6901). Rules: 1) \"\" returns the whole doc; 2) any other pointer must start with \"/\", else throw a SyntaxError; 3) a \"~\" not followed by 0 or 1 anywhere in the pointer throws a SyntaxError; 4) split on \"/\", and in each part replace ~1 with / first, then ~0 with ~ (so \"/~01\" reads key \"~1\"); 5) on an array, the part \"-\" throws an Error; other parts must match /^(0|[1-9][0-9]*)$/, else return undefined (\"01\", \"-1\", \"1.5\", \"length\"); 6) on an object use only own properties (Object.hasOwn), so \"/toString\" on {} is undefined; \"-\" is a normal key on an object; 7) strings, numbers, booleans and null have no children: return undefined; 8) a missing path returns undefined, but a stored null stays null. Keep the signature. Do not change src/config.js. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "Make get() in pointer.js follow the JSON Pointer spec."
+    ]
+  }
+}

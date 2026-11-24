@@ -1,0 +1,20 @@
+{
+  "title": "Cron next",
+  "difficulty": "hard",
+  "category": "spec",
+  "skill": "Limit the scope of a known format",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite next_run(expr, after) in cron.py. expr has exactly 5 space-separated fields (minute hour day month weekday), else ValueError. Minute (0-59) and hour (0-23) accept: '*'; '*/n' = 0, n, 2n... with n >= 1; a number; a range 'a-b' with a <= b, both included; a comma list whose items are numbers or ranges. Day, month and weekday must be '*': any other value raises ValueError. Out-of-range values, step 0, a backwards range or non-numeric text raise ValueError; validate before searching. The result is strictly after `after` (if `after` matches, return the next match) and has second=0, microsecond=0. Only change cron.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Make next_run in cron.py support full cron syntax."
+    ]
+  }
+}

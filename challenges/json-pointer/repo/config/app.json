@@ -1,0 +1,6 @@
+{
+  "server": { "port": 8080, "host": "0.0.0.0" },
+  "servers": [{ "host": "a.internal" }, { "host": "b.internal" }],
+  "paths": { "/health": "ok", "~home": "/srv" },
+  "proxy": null
+}

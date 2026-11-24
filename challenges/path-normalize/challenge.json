@@ -1,0 +1,20 @@
+{
+  "title": "Path traversal",
+  "difficulty": "medium",
+  "category": "security",
+  "skill": "List the attacks and the allowed cases",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "In src/lib/safePath.js, safeJoin(root, userPath) only checks full.startsWith(root), so \"../public-backup/x\" and absolute paths escape /srv/app/public. Rules: decodeURIComponent(userPath) once first; throw an Error if the decoded path is absolute or if any \"/\" segment is exactly \"..\" (so \"%2e%2e/x\" and \"docs/../a.txt\" throw, but \"a..b.txt\" and \"..hidden\" are fine); allow nested folders; resolve against root and require the result to start with root + path.sep; return the absolute decoded path (\"my%20notes.txt\" -> \"/srv/app/public/my notes.txt\"). Only change that file. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "Fix the path traversal hole in the static file server."
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Humanize duration",
+  "difficulty": "easy",
+  "category": "spec",
+  "skill": "Give examples for the output format",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite humanize(seconds) in humanize.py. Units: day (86400 s), hour, minute, second; days are the largest unit (no weeks or years). Show the two largest units that are not 0, joined by \", \", and skip zero units between them: 86700 -> \"1 day, 5 minutes\". Drop the rest, do not round: 7199 -> \"1 hour, 59 minutes\". One unit only if only one is not 0: 7200 -> \"2 hours\". Singular for 1 (\"1 minute\"), plural otherwise. 0 -> \"0 seconds\". Negative raises ValueError. Only change humanize.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Make humanize show durations more precisely."
+    ]
+  }
+}

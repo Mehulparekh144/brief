@@ -1,0 +1,20 @@
+{
+  "title": "Markdown lite",
+  "difficulty": "hard",
+  "category": "security",
+  "skill": "Give the order of steps and the exact output",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite render(md) in mdlite.py. Steps: 1) html.escape(md) first (quote=True, so \" is &quot; and ' is &#x27;; an existing &amp; becomes &amp;amp;); 2) go line by line and strip each line; 3) a line that matches \"# \", \"## \" or \"### \" plus text is a heading on its own: <h1>..</h1>, <h2>, <h3>, text stripped; \"#### x\" and \"#x\" are paragraph text; 4) other lines form paragraphs; a blank or whitespace-only line ends a paragraph; join the lines of one paragraph with one space: <p>..</p>; 5) join all blocks with \"\\n\", no newline at the end; empty input gives \"\"; 6) inline, in headings and paragraphs: [text](url) where url has no spaces or \")\" becomes <a href=\"url\">text</a> only when url starts with http:// or https:// (ignore case), else only the text; then **x** becomes <strong>x</strong>, then *x* becomes <em>x</em>. Keep the signature. Do not change comments.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Make the markdown renderer safe against XSS."
+    ]
+  }
+}

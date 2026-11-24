@@ -1,6 +1,7 @@
 {
   "title": "Slow suite",
   "difficulty": "medium",
+  "category": "bug-fix",
   "skill": "Tell the agent how to check its work",
   "testCmd": "python3 run_checks.py",
   "tokenCap": 160000,

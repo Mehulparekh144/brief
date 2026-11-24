@@ -1,0 +1,20 @@
+{
+  "title": "Amortization",
+  "difficulty": "hard",
+  "category": "spec",
+  "skill": "Pin down the money math: type, rounding, last row",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 10,
+  "protected": [
+    "tests/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite schedule(principal, annual_rate_percent, months) in amortization.py with decimal.Decimal, no floats. Convert each input with Decimal(str(x)). months < 1 raises ValueError. r = annual_rate_percent / 100 / 12, not rounded. payment = principal * r / (1 - (1 + r) ** -months), or principal / months when the rate is 0. Each month: interest = balance * r; principal = payment - interest; balance = old balance - principal. Last month: principal = old balance, payment = old balance + interest, balance 0.00. Round half up to cents with quantize(Decimal('0.01'), ROUND_HALF_UP) at these points only: the principal input, the payment once before month 1, and each month's interest before you use it. Carry the rounded balance into the next month; never keep unrounded values between months. Rows keep the keys month, payment, interest, principal, balance; money values are Decimal. Only change amortization.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "The amortization schedule has rounding problems. Fix it."
+    ]
+  }
+}

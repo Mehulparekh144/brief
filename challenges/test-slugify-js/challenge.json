@@ -1,0 +1,20 @@
+{
+  "title": "Test slugify (JS)",
+  "difficulty": "easy",
+  "category": "testing",
+  "skill": "List the cases the tests must cover",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 5,
+  "protected": [
+    "test/smoke.test.js"
+  ],
+  "briefs": {
+    "good": [
+      "Create test/slugify.test.js for slugify() in src/slugify.js. Use node:test and node:assert/strict, and import { slugify } from \"../src/slugify.js\". One test per rule, each with assert.equal: \"Hello World\" -> \"hello-world\"; \"Crème Brûlée\" -> \"creme-brulee\"; \"a  &  b\" -> \"a-b\"; \"  ¡Hola!  \" -> \"hola\"; \"a\".repeat(50) -> \"a\".repeat(40); \"a\".repeat(39) + \" bcd\" -> \"a\".repeat(39) (the cut at 40 ends on a hyphen, which is dropped). Do not change src/slugify.js or test/smoke.test.js. Then run: node --test --test-reporter=tap test/*.test.js"
+    ],
+    "lazy": [
+      "Write some tests for slugify."
+    ]
+  }
+}

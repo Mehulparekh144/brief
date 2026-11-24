@@ -1,0 +1,20 @@
+{
+  "title": "Query string",
+  "difficulty": "medium",
+  "category": "spec",
+  "skill": "State the parsing edge cases up front",
+  "testCmd": "node --test --test-reporter=tap test/*.test.js",
+  "tokenCap": 160000,
+  "minTests": 9,
+  "protected": [
+    "test/"
+  ],
+  "briefs": {
+    "good": [
+      "Rewrite parseQuery(str) in src/query.js. Rules: 1) strip one leading \"?\"; 2) split on \"&\" and skip empty pieces; 3) key = text before the first \"=\", value = everything after it (\"x=a=b\" gives \"a=b\"); 4) skip a piece with an empty key (\"=1\"); 5) a piece without \"=\" gives true, \"a=\" gives \"\"; 6) replace \"+\" with a space in keys and values, before decoding; 7) then decodeURIComponent keys and values, and if that throws keep the text after step 6; 8) a repeated key gives an array of its values in order (\"tag&tag=x\" gives [true, \"x\"]), a key seen once keeps a plain value; 9) \"\" and \"?\" give {}. Do not change other files. Then run: node --test test/*.test.js"
+    ],
+    "lazy": [
+      "parseQuery is too simple. Make it handle real query strings."
+    ]
+  }
+}

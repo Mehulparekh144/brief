@@ -1,0 +1,20 @@
+{
+  "title": "Test money utils",
+  "difficulty": "medium",
+  "category": "testing",
+  "skill": "Name the structure and the cases you want tested",
+  "testCmd": "python3 -m unittest discover -s tests -v",
+  "tokenCap": 160000,
+  "minTests": 7,
+  "protected": [
+    "tests/test_smoke.py"
+  ],
+  "briefs": {
+    "good": [
+      "Create tests/test_money.py for money.py with unittest. Start it like tests/test_smoke.py (sys.path insert). Use exactly three TestCase classes, one per function. AddTest: add('1.10', '2.20') == Decimal('3.30'); add('1', '2', '3', '4') == Decimal('10.00'); add('0.125') == Decimal('0.13') (half up); add(0.1, '1.00') raises TypeError. SplitTest: split('10.00', 3) == [Decimal('3.34'), Decimal('3.33'), Decimal('3.33')]; sum(split('100.00', 7)) == Decimal('100.00'). FormatTest: format_usd('1234.5') == '$1,234.50'; format_usd('-5') == '-$5.00'. Do not change money.py. Then run: python3 -m unittest discover -s tests -v"
+    ],
+    "lazy": [
+      "Write tests for money.py."
+    ]
+  }
+}
