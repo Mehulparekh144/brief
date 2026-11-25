@@ -97,7 +97,8 @@ export default async function Landing({ searchParams }: { searchParams: Promise<
             <span className="label">The same bug, two briefs · measured</span>
             <BriefRace lanes={LANES} par={PAR} />
             <p className="text-xs text-muted-foreground">Claude Haiku 5.5 · both briefs passed the hidden tests · the band is par.</p>
-            <BorderBeam size={90} duration={9} colorFrom="#F7E36A" colorTo="#C9AE00" />
+            {/* motion runs this in JS, so the CSS reduced-motion override cannot stop it */}
+            <BorderBeam className="motion-reduce:hidden" size={90} duration={9} colorFrom="#F7E36A" colorTo="#C9AE00" />
           </Card>
           <figure className="hero-brie">
             <Brie mood="happy" size={120} />
