@@ -203,6 +203,11 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
             {!debrief ? (
               <>
                 <p className="working">Brie is reading your session…</p>
+                <div className="skeletons" aria-hidden="true">
+                  <span className="skeleton" style={{ width: "92%" }} />
+                  <span className="skeleton" style={{ width: "78%" }} />
+                  <span className="skeleton" style={{ width: "85%" }} />
+                </div>
                 <AutoRefresh seconds={3} />
               </>
             ) : debrief.error ? (

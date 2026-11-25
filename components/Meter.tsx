@@ -17,7 +17,7 @@ export function Meter({ tokens, par, cap }: { tokens: number; par: Par | null; c
         <span className="meter-delta">{delta}</span>
       </div>
       <div className="meter-bar">
-        <span className="fill" style={{ width: pct(tokens) }} />
+        <span className="fill" style={{ transform: `scaleX(${Math.min(1, tokens / cap)})` }} />
         {par && <span className="par" style={{ left: pct(par.low), width: `max(3px, ${(((par.high - par.low) / cap) * 100).toFixed(2)}%)` }} />}
       </div>
       <div className="meter-scale">

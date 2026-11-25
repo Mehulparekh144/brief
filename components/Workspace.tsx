@@ -200,7 +200,10 @@ export function Workspace({ id, slug, title, difficulty, skill, statement, par, 
           <DifficultyChip level={difficulty} />
         </div>
         <div className="ws-meter">
-          <Brie mood={moodFor(tokens, par, cap, busy)} size={40} />
+          {(() => {
+            const mood = moodFor(tokens, par, cap, busy);
+            return <Brie key={mood} mood={mood} size={40} />; // new key on a mood change replays her pop
+          })()}
           <div style={{ display: "grid", gap: 2, minWidth: 0 }}>
             <Meter tokens={tokens} par={par} cap={cap} />
             <div style={{ justifySelf: "end" }}>
