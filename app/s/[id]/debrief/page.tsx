@@ -1,10 +1,17 @@
 import Link from "next/link";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { notFound, redirect } from "next/navigation";
 import { TrackOnce } from "@/components/Analytics.tsx";
 import { AutoRefresh, DebriefRating } from "@/components/Feedback.tsx";
 import { DifficultyChip, ParHelp } from "@/components/Bits.tsx";
 import { Brie } from "@/components/Brie.tsx";
+import { Celebrate } from "@/components/Celebrate.tsx";
+import { Count } from "@/components/Count.tsx";
 import { StartButton } from "@/components/StartButton.tsx";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Topbar } from "@/components/Topbar.tsx";
 import { requireUser } from "@/lib/auth.ts";
 import type { Debrief } from "@/lib/coach.ts";
@@ -13,6 +20,7 @@ import { db } from "@/lib/supabase.ts";
 import { loadChallenge } from "@/src/challenge.ts";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Debrief" };
 
 type Brief = { text: string; tokens: number; actions: string[] };
 const COLORS = ["var(--s1)", "var(--s2)", "var(--s3)"];
@@ -57,9 +65,9 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
         <Topbar me={me} />
         <main className="page narrow">
           <p className="notice bad">This attempt ended without grading. It does not count.</p>
-          <Link className="btn primary" href="/challenges" style={{ justifySelf: "start" }}>
-            Back to practice
-          </Link>
+          <Button asChild className="justify-self-start">
+            <Link href="/challenges">Back to practice</Link>
+          </Button>
         </main>
       </>
     );
@@ -80,6 +88,7 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
     <>
       <Topbar me={me} />
       <main className="page">
+        {s.passed && v.tone === "good" && <Celebrate />}
         <TrackOnce event="debrief_viewed" props={{ challenge: ch.slug, passed: s.passed, tokens: total, par: par?.median ?? null }} />
         <header style={{ display: "flex", flexWrap: "wrap", gap: "10px 16px", alignItems: "center" }}>
           <div style={{ marginRight: "auto", display: "grid", gap: 4 }}>
@@ -89,19 +98,21 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
               <DifficultyChip level={ch.difficulty} />
             </div>
           </div>
-          <span className={`pill ${s.passed ? "good" : "bad"}`}>
+          <Badge variant={s.passed ? "good" : "bad"} className="font-num">
             {s.passed ? "✓" : "✗"} Hidden tests {s.tests_passed}/{s.tests_total} {s.passed ? "passed" : "failed"}
-          </span>
-          {minutes && <span className="pill">{minutes} min</span>}
-          <span className="pill">{s.model}</span>
+          </Badge>
+          {minutes && <Badge variant="secondary" className="font-num">{minutes} min</Badge>}
+          <Badge variant="secondary" className="font-num">{s.model}</Badge>
         </header>
 
-        <section className="card score">
+        <Card className="score grid px-5">
           <div>
-            <div className="big">{fmt(total)}</div>
+            <div className="big">
+              <Count value={total} />
+            </div>
             <div className="big-sub">
               <span>tokens</span>
-              {s.passed ? <span className={`pill ${v.tone}`}>{v.label}</span> : <span className="pill bad">Tests failed: no par result</span>}
+              {s.passed ? <Badge variant={(v.tone) || "secondary"} className="font-num">{v.label}</Badge> : <Badge variant="bad" className="font-num">Tests failed: no par result</Badge>}
               <span>{vsPar(total, par)}</span>
               <span>par {parRange(par)}</span>
               <ParHelp />
@@ -147,32 +158,32 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
               )}
             </div>
           </div>
-        </section>
+        </Card>
 
         <div className="db-grid">
-          <section className="card">
+          <Card className="px-5">
             <h2 style={{ fontSize: 16 }}>Your messages</h2>
-            <div className="tbl">
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Message</th>
-                    <th className="n">Tokens</th>
-                    <th>What the agent did</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#</TableHead>
+                    <TableHead>Message</TableHead>
+                    <TableHead className="text-right font-num tabular-nums">Tokens</TableHead>
+                    <TableHead>What the agent did</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {briefs.map((b, i) => (
-                    <tr key={i}>
-                      <td>{i + 1}</td>
-                      <td style={{ maxWidth: 280 }}>{b.text.length > 140 ? `${b.text.slice(0, 140)}…` : b.text}</td>
-                      <td className="n">{fmt(b.tokens)}</td>
-                      <td>{summarize(b.actions)}</td>
-                    </tr>
+                    <TableRow key={i}>
+                      <TableCell>{i + 1}</TableCell>
+                      <TableCell style={{ maxWidth: 280 }}>{b.text.length > 140 ? `${b.text.slice(0, 140)}…` : b.text}</TableCell>
+                      <TableCell className="text-right font-num tabular-nums">{fmt(b.tokens)}</TableCell>
+                      <TableCell>{summarize(b.actions)}</TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
             {debrief?.better_first_message && (
               <div className="better">
@@ -190,9 +201,9 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
                 {s.diff || "No changes."}
               </pre>
             </details>
-          </section>
+          </Card>
 
-          <section className="card">
+          <Card className="px-5">
             <div className="coach-head">
               <Brie mood={!debrief ? "thinking" : !s.passed ? "shocked" : v.tone === "good" ? "happy" : "worried"} size={44} />
               <div>
@@ -203,6 +214,11 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
             {!debrief ? (
               <>
                 <p className="working">Brie is reading your session…</p>
+                <div className="grid gap-2" aria-hidden="true">
+                  <Skeleton className="h-3 w-[92%]" />
+                  <Skeleton className="h-3 w-[78%]" />
+                  <Skeleton className="h-3 w-[85%]" />
+                </div>
                 <AutoRefresh seconds={3} />
               </>
             ) : debrief.error ? (
@@ -214,7 +230,7 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
                   {debrief.tips.map((t, i) => (
                     <div key={i} className="tip">
                       <div className="tip-head">
-                        <span className={`pill ${t.kind === "keep" ? "good" : "warn"}`}>Msg {t.message}</span>
+                        <Badge variant={t.kind === "keep" ? "good" : "warn"} className="font-num">Msg {t.message}</Badge>
                         <b>{t.title}</b>
                       </div>
                       <p>{t.detail}</p>
@@ -225,12 +241,12 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
             )}
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <StartButton slug={ch.slug} label="Try again" />
-              <Link className="btn" href="/challenges">
-                All challenges
-              </Link>
+              <Button asChild variant="outline">
+                <Link href="/challenges">All challenges</Link>
+              </Button>
             </div>
             {debrief && !debrief.error && <DebriefRating sessionId={id} />}
-          </section>
+          </Card>
         </div>
       </main>
     </>

@@ -1,5 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 
 async function save(body: Record<string, unknown>) {
@@ -23,20 +26,24 @@ export function DebriefRating({ sessionId }: { sessionId: string }) {
   if (sent) return <p className="muted">Thanks. Your rating helps us improve the coach.</p>;
   return (
     <div style={{ display: "grid", gap: 10 }}>
-      <div className="rating" role="group" aria-label="Was this debrief useful? 1 to 5">
-        <span>Was this debrief useful?</span>
+      <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Was this debrief useful? 1 to 5">
+        <span className="mr-1 text-sm">Was this debrief useful?</span>
         {[1, 2, 3, 4, 5].map((n) => (
-          <button key={n} aria-pressed={rating === n} onClick={() => setRating(n)}>
+          <Button key={n} size="icon-sm" variant={rating === n ? "default" : "outline"} aria-pressed={rating === n} onClick={() => setRating(n)} className="font-num">
             {n}
-          </button>
+          </Button>
         ))}
       </div>
       {rating !== null && (
         <>
-          <label htmlFor="db-text" className="muted">What would make it more useful? (optional)</label>
-          <textarea id="db-text" rows={3} maxLength={4000} value={text} onChange={(e) => setText(e.target.value)} />
+          <Label htmlFor="db-text" className="text-muted-foreground">
+            What would make it more useful? (optional)
+          </Label>
+          <Textarea id="db-text" rows={3} maxLength={4000} value={text} onChange={(e) => setText(e.target.value)} />
           {error && <p className="error">{error}</p>}
-          <button className="btn primary" style={{ justifySelf: "start" }} onClick={send}>Send rating</button>
+          <Button className="justify-self-start" onClick={send}>
+            Send rating
+          </Button>
         </>
       )}
     </div>

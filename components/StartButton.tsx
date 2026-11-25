@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { track } from "./Analytics.tsx";
 
 /** Starts (or resumes) a challenge through the API, then opens the workspace. */
@@ -22,9 +23,9 @@ export function StartButton({ slug, label }: { slug: string; label: string }) {
 
   return (
     <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
-      <button className="btn primary" disabled={pending} onClick={start}>
+      <Button disabled={pending} onClick={start}>
         {pending ? "Setting up…" : label}
-      </button>
+      </Button>
       {error && (
         <span className="error" role="alert" style={{ fontSize: 12, maxWidth: 260, textAlign: "right" }}>
           {error}

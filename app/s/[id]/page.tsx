@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { Topbar } from "@/components/Topbar.tsx";
 import { Workspace } from "@/components/Workspace.tsx";
 import { requireUser } from "@/lib/auth.ts";
@@ -8,6 +9,7 @@ import { db } from "@/lib/supabase.ts";
 import { capFor, loadChallenge } from "@/src/challenge.ts";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Workspace" };
 
 export default async function WorkspacePage({ params }: { params: Promise<{ id: string }> }) {
   const me = await requireUser();
@@ -24,9 +26,9 @@ export default async function WorkspacePage({ params }: { params: Promise<{ id: 
         <Topbar me={me} />
         <main className="page narrow">
           <p className="notice bad">The workspace stopped. This attempt does not count. Start again.</p>
-          <Link className="btn primary" href="/challenges" style={{ justifySelf: "start" }}>
-            Back to practice
-          </Link>
+          <Button asChild className="justify-self-start">
+            <Link href="/challenges">Back to practice</Link>
+          </Button>
         </main>
       </>
     );

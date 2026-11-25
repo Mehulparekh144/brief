@@ -1,13 +1,18 @@
 import Link from "next/link";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { notFound } from "next/navigation";
+import { LinkTabs } from "@/components/LinkTabs.tsx";
 import { Topbar } from "@/components/Topbar.tsx";
 import { requireUser } from "@/lib/auth.ts";
 import { db } from "@/lib/supabase.ts";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Reports" };
 
 const KIND_LABEL: Record<string, string> = { bug: "Bug", feature: "Feature", confusing: "Confusing", other: "Other", note: "Note", rating: "Rating" };
-const KIND_TONE: Record<string, string> = { bug: "bad", feature: "good", confusing: "warn" };
+const KIND_TONE: Record<string, "good" | "warn" | "bad"> = { bug: "bad", feature: "good", confusing: "warn" };
 
 export default async function AdminPage({ searchParams }: { searchParams: Promise<{ kind?: string; status?: string }> }) {
   const me = await requireUser();
@@ -35,57 +40,58 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             {avg !== null && ` · average ${avg.toFixed(2)} / 5`}
           </p>
         </header>
-        <nav className="filter-tabs" aria-label="Filter reports">
-          {[undefined, "bug", "feature", "confusing", "other", "note", "rating"].map((k) => (
-            <Link key={k ?? "all"} href={link(k, status)} aria-current={kind === k ? "page" : undefined}>
-              {k ? KIND_LABEL[k] : "All"}
-            </Link>
-          ))}
-          <span className="spacer" />
-          <Link href={link(kind, "open")} aria-current={status === "open" ? "page" : undefined}>
-            Open
-          </Link>
-          <Link href={link(kind, "all")} aria-current={status === "all" ? "page" : undefined}>
-            Include done
-          </Link>
-        </nav>
-        <div className="tbl card">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Type</th>
-                <th>Title</th>
-                <th>User</th>
-                <th>Session</th>
-                <th>Status</th>
-                <th>When (UTC)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(rows ?? []).map((r) => (
-                <tr key={r.id}>
-                  <td className="num muted">{r.id}</td>
-                  <td>
-                    <span className={`pill ${KIND_TONE[r.kind] ?? ""}`}>{KIND_LABEL[r.kind] ?? r.kind}</span>
-                  </td>
-                  <td>
-                    <Link href={`/admin/reports/${r.id}`}>{r.title ?? (r.rating ? `Rated ${r.rating}/5` : (r.text ?? "").slice(0, 80))}</Link>
-                  </td>
-                  <td>{who.get(r.user_id) ?? "—"}</td>
-                  <td className="num" style={{ fontSize: 11 }}>
-                    {r.session_id ? r.session_id.slice(0, 8) : "—"}
-                  </td>
-                  <td>{r.status}</td>
-                  <td className="num" style={{ fontSize: 11 }}>
-                    {r.created_at.slice(0, 16).replace("T", " ")}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {!rows?.length && <p className="muted">Nothing here.</p>}
+        <div className="flex flex-wrap items-end justify-between gap-3 border-b">
+          <LinkTabs
+            label="Report type"
+            value={kind ?? "all"}
+            tabs={[undefined, "bug", "feature", "confusing", "other", "note", "rating"].map((k) => ({ value: k ?? "all", label: k ? KIND_LABEL[k] : "All", href: link(k, status) }))}
+          />
+          <LinkTabs
+            label="Report status"
+            value={status}
+            tabs={[
+              { value: "open", label: "Open", href: link(kind, "open") },
+              { value: "all", label: "Include done", href: link(kind, "all") },
+            ]}
+          />
         </div>
+        <Card className="px-3">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>#</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Title</TableHead>
+                <TableHead>User</TableHead>
+                <TableHead>Session</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>When (UTC)</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {(rows ?? []).map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell className="num muted">{r.id}</TableCell>
+                  <TableCell>
+                    <Badge variant={(KIND_TONE[r.kind] ?? "") || "secondary"} className="font-num">{KIND_LABEL[r.kind] ?? r.kind}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Link href={`/admin/reports/${r.id}`}>{r.title ?? (r.rating ? `Rated ${r.rating}/5` : (r.text ?? "").slice(0, 80))}</Link>
+                  </TableCell>
+                  <TableCell>{who.get(r.user_id) ?? "—"}</TableCell>
+                  <TableCell className="num" style={{ fontSize: 11 }}>
+                    {r.session_id ? r.session_id.slice(0, 8) : "—"}
+                  </TableCell>
+                  <TableCell>{r.status}</TableCell>
+                  <TableCell className="num" style={{ fontSize: 11 }}>
+                    {r.created_at.slice(0, 16).replace("T", " ")}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          {!rows?.length && <p className="muted">Nothing here.</p>}
+        </Card>
       </main>
     </>
   );

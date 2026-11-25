@@ -58,6 +58,21 @@ Checked against the security-review checklist (github.com/WorldFlowAI/everything
 - Logo lockup `<Logo />` (Brie mark + "brieflab" wordmark): top bars and large on the landing page. Favicon: `app/icon.svg`.
 - Brie is the coach's face ("Brie's debrief"). She is not the agent: the agent stays a plain tool in the chat.
 
+## SEO (2026-11-24)
+Applied the on-page, technical, schema and agent-readiness checklists from github.com/AgricIDaniel/claude-seo (read as data; the plugin and its scripts were not installed).
+- Landing: title 44 chars, description 158, canonical, Open Graph + Twitter card, `app/opengraph-image.tsx` (Brie + tagline), JSON-LD (Organization + WebApplication), a "What you practice" section.
+- `app/robots.ts` (private paths disallowed; AI crawlers allowed on the landing page), `app/sitemap.ts`, `app/llms.txt/route.ts`, tab titles on every page (`%s · Brieflab`).
+- `robots.txt`, `sitemap.xml` and the OG image are static at build time: set `SITE_URL` before the production build.
+
+## shadcn + Magic UI (2026-11-24)
+User asked for shadcn and Magic UI components, and the awwwards skill (github.com/ga14ctic/awwwards-skill, read as data, nothing installed).
+- Tailwind v4 + shadcn (style `radix-nova`, `components.json`). Parts in `components/ui/`: button, badge, card, dialog, tabs, popover, table, input, textarea, select, label, skeleton.
+- Magic UI parts: number-ticker (`components/Count.tsx`), marquee, dot-pattern, shimmer-button (`components/ShimmerLink.tsx`), border-beam, animated-shiny-text. Confetti on a passed debrief (`components/Celebrate.tsx`).
+- Brand stays the same: shadcn tokens (`--background`, `--primary`, …) map to the Brieflab tokens in `app/globals.css`. Badge has `good`, `warn`, `bad`, `hl` variants.
+- Converted: Report dialog, par popover, difficulty chips, all tables, tab bars (`components/LinkTabs.tsx`), buttons, inputs.
+- Landing rebuilt (awwwards brief): dot-grid hero, "Same fix. Half the tokens.", a measured brief race (`components/BriefRace.tsx`, real late-fees calibration: 16,290 vs 7,685 tokens), challenge marquee, step cards, category bento.
+- Checked in a browser at 375, 768, 1280 and 1920 px, dark and light: no horizontal scroll, no dev-overlay issues, only same-origin requests.
+
 ## Key decisions and why
 - Agent loop on our server; only tools run in the sandbox (no keys or internet inside). No LiteLLM.
 - Manual loop instead of the SDK tool runner: cap checks before each call and per-message token counts.
@@ -65,20 +80,25 @@ Checked against the security-review checklist (github.com/WorldFlowAI/everything
 - Only API routes import `lib/live.ts`. Pages read session state from the database (`status`, `heartbeat_at`). Starts go through `POST /api/sessions` from the browser, not a server action.
 - Live sessions write `heartbeat_at` every 15 s. A sweep (on start, every 5 min) closes sessions silent for 60 s and kills sandboxes without an active session (sandbox metadata: app, site, session).
 - All DB access on the server with the secret key; RLS on with no policies, so browsers have no table access.
-- Plain CSS with brand tokens (no Tailwind/shadcn): the design was already written as CSS.
+- shadcn + Magic UI for components (user's choice). The older Brieflab CSS stays in `@layer components`, so Tailwind utilities on a component override it.
 - Nav labels: "Practice" and "My sessions" (user's choice). Feedback is one "Report" dialog with types.
 - Coach on Claude Opus 5.5 with `fallbacks: "default"` (server-side refusal fallback, beta `server-side-fallback-2026-07-01`).
 
 ## Gotchas
+- Motion: use the timing tokens in `app/globals.css` (`--dur-*`, `--ease-*`). Animate only transform and opacity. Put every animation inside `@media (prefers-reduced-motion: no-preference)`, and hover effects inside `@media (hover: hover)`.
+- shadcn: our muted text color is `--ink-3`. `--muted` is shadcn's muted *background*. Dark mode is the media query (`@custom-variant dark`), not a `.dark` class.
+- shadcn files that use hooks need `"use client"` (`components.json` has `rsc: true`, so new `npx shadcn add` files get it).
+- Do not add the Geist font that `shadcn init` adds: `--font-sans` maps to our `--font-ui`.
+- canvas-confetti draws in a blob worker: the CSP needs `worker-src 'self' blob:`.
 - If you add a third-party script, image or API host, add it to the CSP in `next.config.ts`, or the browser blocks it.
 - New tables need `enable row level security` in their migration (the public key can reach every table in `public`).
 - Calibrate many challenges from bash, not zsh: zsh does not split `$VAR` into words (`bash -c 'npm run calibrate -- $NEW'`).
 - A good brief that fails calibration usually means the statement is ambiguous (see `amortization`): fix the statement, not the tests.
-- Links: no underline by default (`a:hover, p a` only). Use `.filter-tabs` for tab bars, not `pill` links.
+- Links: no underline by default (`a:hover, p a` only). Use `components/LinkTabs.tsx` for tab bars.
 - `npm run e2e` deletes the e2e user's sessions and feedback, so test data stays out of Admin → Reports.
 - `next dev` serves pages, server actions and API routes from **separate processes**; `next start` uses one. Never share in-memory state between a page and an API route.
 - Next.js 16: `middleware.ts` is now `proxy.ts`. `params`/`searchParams` are promises. Read `node_modules/next/dist/docs/` first (see AGENTS.md).
-- TypeScript is pinned to 5.9 (Next.js does not support TS 7 yet).
+- TypeScript 7.0 builds with Next.js 16.4 here (`npx tsc --noEmit` and `next build` pass).
 - `src/challenge.ts` reads `challenges/` from `process.cwd()`; a `new URL(..., import.meta.url)` there breaks the Next build.
 - Do not run `next build` while `next dev` runs in the same folder if you see odd dev errors; restart dev.
 - E2B base template: Node 20.9, Python 3.11, git. Internet off. Challenges must need no packages.

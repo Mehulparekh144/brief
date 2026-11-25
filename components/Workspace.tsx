@@ -7,6 +7,9 @@ import type { Par } from "@/src/challenge.ts";
 import { track } from "./Analytics.tsx";
 import { DifficultyChip, ParHelp } from "./Bits.tsx";
 import { Brie, Logo } from "./Brie.tsx";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Code } from "./Code.tsx";
 import { Meter } from "./Meter.tsx";
 import { ReportButton } from "./Report.tsx";
@@ -181,9 +184,9 @@ export function Workspace({ id, slug, title, difficulty, skill, statement, par, 
     return (
       <main className="page narrow">
         <p className="notice bad">{ended ?? "The workspace stopped. This attempt does not count."}</p>
-        <Link className="btn primary" href="/challenges" style={{ justifySelf: "start" }}>
-          Back to practice
-        </Link>
+        <Button asChild className="justify-self-start">
+          <Link href="/challenges">Back to practice</Link>
+        </Button>
       </main>
     );
   }
@@ -200,7 +203,10 @@ export function Workspace({ id, slug, title, difficulty, skill, statement, par, 
           <DifficultyChip level={difficulty} />
         </div>
         <div className="ws-meter">
-          <Brie mood={moodFor(tokens, par, cap, busy)} size={40} />
+          {(() => {
+            const mood = moodFor(tokens, par, cap, busy);
+            return <Brie key={mood} mood={mood} size={40} />; // new key on a mood change replays her pop
+          })()}
           <div style={{ display: "grid", gap: 2, minWidth: 0 }}>
             <Meter tokens={tokens} par={par} cap={cap} />
             <div style={{ justifySelf: "end" }}>
@@ -210,15 +216,15 @@ export function Workspace({ id, slug, title, difficulty, skill, statement, par, 
         </div>
         <div className="ws-actions">
           <ReportButton inline />
-          <button className="btn" onClick={runTests} disabled={locked || testing} title="Runs the public tests. Costs 0 tokens.">
+          <Button variant="outline" onClick={runTests} disabled={locked || testing} title="Runs the public tests. Costs 0 tokens.">
             {testing ? "Testing…" : "Run tests"}
-          </button>
-          <button className="btn" onClick={() => post(`${base}/stop`)} disabled={!busy}>
+          </Button>
+          <Button variant="outline" onClick={() => post(`${base}/stop`)} disabled={!busy}>
             Stop
-          </button>
-          <button className="btn primary" onClick={submit} disabled={busy || submitting || submitted} onBlur={() => setConfirmSubmit(false)}>
+          </Button>
+          <Button onClick={submit} disabled={busy || submitting || submitted} onBlur={() => setConfirmSubmit(false)}>
             {submitting ? "Grading…" : confirmSubmit ? "Confirm: run hidden tests" : "Submit"}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -331,9 +337,9 @@ export function Workspace({ id, slug, title, difficulty, skill, statement, par, 
                         </div>
                       ) : (
                         <div key={i} style={{ display: "grid", gap: 6 }}>
-                          <span className={`pill ${it.ok ? "good" : "warn"}`} style={{ justifySelf: "start" }}>
+                          <Badge variant={it.ok ? "good" : "warn"} className="justify-self-start font-num">
                             Public tests: {it.passed}/{it.total} passed · 0 tokens
-                          </span>
+                          </Badge>
                           <details>
                             <summary className="muted" style={{ fontSize: 12 }}>
                               Test output
@@ -356,8 +362,9 @@ export function Workspace({ id, slug, title, difficulty, skill, statement, par, 
             <label htmlFor="brief" className="sr-only">
               Message to the agent
             </label>
-            <textarea
+            <Textarea
               id="brief"
+              className="min-h-[84px] max-h-[260px] resize-y"
               value={draft}
               maxLength={2000}
               placeholder={busy ? "The agent is working. Press Esc or Stop to interrupt." : "Message the agent…"}
@@ -371,9 +378,9 @@ export function Workspace({ id, slug, title, difficulty, skill, statement, par, 
             />
             <div className="composer-row">
               <span className="hint">⌘↵ send · Esc stop · {fmt(draft.length)} / 2,000</span>
-              <button className="btn primary" onClick={send} disabled={locked || !draft.trim()}>
+              <Button onClick={send} disabled={locked || !draft.trim()}>
                 Send
-              </button>
+              </Button>
             </div>
           </div>
         </section>

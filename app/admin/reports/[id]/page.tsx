@@ -1,5 +1,9 @@
 import Link from "next/link";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { notFound } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Topbar } from "@/components/Topbar.tsx";
 import { setReportStatus } from "@/lib/actions.ts";
 import { requireUser } from "@/lib/auth.ts";
@@ -7,8 +11,9 @@ import { fmt } from "@/lib/format.ts";
 import { db } from "@/lib/supabase.ts";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Report" };
 
-const TONE: Record<string, string> = { user: "good", error: "bad", stop: "warn", notice: "warn" };
+const TONE: Record<string, "good" | "warn" | "bad"> = { user: "good", error: "bad", stop: "warn", notice: "warn" };
 
 export default async function ReportPage({ params }: { params: Promise<{ id: string }> }) {
   const me = await requireUser();
@@ -37,43 +42,43 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
         </header>
 
         <div className="db-grid">
-          <section className="card">
+          <Card className="px-5">
             <h2 style={{ fontSize: 16 }}>Details</h2>
             <p style={{ whiteSpace: "pre-wrap" }}>{r.text || <span className="muted">No details.</span>}</p>
             {r.context && (
-              <div className="tbl">
-                <table>
-                  <tbody>
+              <div>
+                <Table>
+                  <TableBody>
                     {Object.entries(r.context as Record<string, string>).map(([k, v]) => (
-                      <tr key={k}>
-                        <td className="label">{k}</td>
-                        <td style={{ fontSize: 13 }}>{v}</td>
-                      </tr>
+                      <TableRow key={k}>
+                        <TableCell className="label">{k}</TableCell>
+                        <TableCell style={{ fontSize: 13 }}>{v}</TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
             )}
             <form action={setReportStatus} style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <input type="hidden" name="id" value={r.id} />
               <span className="label">Status: {r.status}</span>
               {["new", "triaged", "done"].map((st) => (
-                <button key={st} name="status" value={st} className={`btn ${r.status === st ? "primary" : ""}`}>
+                <Button key={st} name="status" value={st} size="sm" variant={r.status === st ? "default" : "outline"}>
                   {st}
-                </button>
+                </Button>
               ))}
             </form>
-          </section>
+          </Card>
 
-          <section className="card">
+          <Card className="px-5">
             <h2 style={{ fontSize: 16 }}>Linked session</h2>
             {!s ? (
               <p className="muted">No session linked.</p>
             ) : (
               <>
-                <div className="tbl">
-                  <table>
-                    <tbody>
+                <div>
+                  <Table>
+                    <TableBody>
                       {[
                         ["id", s.id],
                         ["challenge", s.challenge],
@@ -85,61 +90,61 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
                         ["cost", `agent $${Number(s.cost_usd).toFixed(4)} · coach $${Number(s.coach_cost_usd).toFixed(4)}`],
                         ["time (UTC)", `${s.started_at.slice(0, 19).replace("T", " ")} → ${s.ended_at ? s.ended_at.slice(11, 19) : "…"}`],
                       ].map(([k, v]) => (
-                        <tr key={k}>
-                          <td className="label">{k}</td>
-                          <td style={{ fontSize: 13 }}>{v}</td>
-                        </tr>
+                        <TableRow key={k}>
+                          <TableCell className="label">{k}</TableCell>
+                          <TableCell style={{ fontSize: 13 }}>{v}</TableCell>
+                        </TableRow>
                       ))}
-                    </tbody>
-                  </table>
+                    </TableBody>
+                  </Table>
                 </div>
                 {s.status === "submitted" && <Link href={`/s/${s.id}/debrief`}>Open the debrief →</Link>}
               </>
             )}
-          </section>
+          </Card>
         </div>
 
         {events && (
-          <section className="card">
+          <Card className="px-5">
             <h2 style={{ fontSize: 16 }}>Session transcript ({events.length} events, meter updates hidden)</h2>
-            <div className="tbl">
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Time</th>
-                    <th>Kind</th>
-                    <th>Content</th>
-                    <th className="n">Tokens</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#</TableHead>
+                    <TableHead>Time</TableHead>
+                    <TableHead>Kind</TableHead>
+                    <TableHead>Content</TableHead>
+                    <TableHead className="text-right font-num tabular-nums">Tokens</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {events.map((e) => {
                     const p = e.payload as Record<string, unknown>;
                     const content = p.text ?? (e.kind === "tests" ? `${p.passed}/${p.total} public tests` : e.kind === "busy" ? (p.busy ? "agent started" : "agent idle") : JSON.stringify(p));
                     return (
-                      <tr key={e.seq}>
-                        <td className="num" style={{ fontSize: 11 }}>
+                      <TableRow key={e.seq}>
+                        <TableCell className="num" style={{ fontSize: 11 }}>
                           {e.seq}
-                        </td>
-                        <td className="num" style={{ fontSize: 11 }}>
+                        </TableCell>
+                        <TableCell className="num" style={{ fontSize: 11 }}>
                           {e.created_at.slice(11, 19)}
-                        </td>
-                        <td>
-                          <span className={`pill ${TONE[e.kind] ?? ""}`}>{e.kind}</span>
-                        </td>
-                        <td style={{ whiteSpace: "pre-wrap", fontSize: 13, maxWidth: 640 }}>{String(content)}</td>
-                        <td className="n">{p.tokens ? fmt(Number(p.tokens)) : ""}</td>
-                      </tr>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={(TONE[e.kind] ?? "") || "secondary"} className="font-num">{e.kind}</Badge>
+                        </TableCell>
+                        <TableCell style={{ whiteSpace: "pre-wrap", fontSize: 13, maxWidth: 640 }}>{String(content)}</TableCell>
+                        <TableCell className="text-right font-num tabular-nums">{p.tokens ? fmt(Number(p.tokens)) : ""}</TableCell>
+                      </TableRow>
                     );
                   })}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
-          </section>
+          </Card>
         )}
         {s?.diff && (
-          <details className="card">
+          <details className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
             <summary>Diff</summary>
             <pre className="tests-out" style={{ maxHeight: 500 }}>
               {s.diff}
@@ -147,7 +152,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
           </details>
         )}
         {s?.debrief && (
-          <details className="card">
+          <details className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
             <summary>Debrief JSON</summary>
             <pre className="tests-out">{JSON.stringify(s.debrief, null, 2)}</pre>
           </details>
