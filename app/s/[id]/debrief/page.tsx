@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { TrackOnce } from "@/components/Analytics.tsx";
 import { AutoRefresh, DebriefRating } from "@/components/Feedback.tsx";
 import { DifficultyChip, ParHelp } from "@/components/Bits.tsx";
+import { Brie } from "@/components/Brie.tsx";
 import { StartButton } from "@/components/StartButton.tsx";
 import { Topbar } from "@/components/Topbar.tsx";
 import { requireUser } from "@/lib/auth.ts";
@@ -192,10 +193,16 @@ export default async function DebriefPage({ params }: { params: Promise<{ id: st
           </section>
 
           <section className="card">
-            <h2 style={{ fontSize: 16 }}>Coach</h2>
+            <div className="coach-head">
+              <Brie mood={!debrief ? "thinking" : !s.passed ? "shocked" : v.tone === "good" ? "happy" : "worried"} size={44} />
+              <div>
+                <h2 style={{ fontSize: 16 }}>Brie&apos;s debrief</h2>
+                <span className="label">Your coach</span>
+              </div>
+            </div>
             {!debrief ? (
               <>
-                <p className="working">The coach is writing your debrief…</p>
+                <p className="working">Brie is reading your session…</p>
                 <AutoRefresh seconds={3} />
               </>
             ) : debrief.error ? (

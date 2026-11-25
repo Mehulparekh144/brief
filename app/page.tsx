@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Brie, Logo } from "@/components/Brie.tsx";
 import { Topbar } from "@/components/Topbar.tsx";
 import { currentUser } from "@/lib/auth.ts";
 
@@ -18,6 +19,8 @@ export default async function Landing({ searchParams }: { searchParams: Promise<
       <main className="page">
         {error === "signin" && <p className="notice bad">Sign-in did not finish. Try again.</p>}
         <section className="hero">
+          <div className="hero-text">
+          <Logo big />
           <span className="label">Practice range for AI coding agents</span>
           <h1>Get the same result with fewer tokens.</h1>
           <p>
@@ -39,6 +42,11 @@ export default async function Landing({ searchParams }: { searchParams: Promise<
               </a>
             )}
           </div>
+          </div>
+          <figure className="hero-brie">
+            <Brie mood="happy" size={150} />
+            <figcaption className="bubble">Hi, I&apos;m Brie. Send the agent a clear brief, and I&apos;ll show you where every token went.</figcaption>
+          </figure>
         </section>
 
         <ol className="loop" style={{ listStyle: "none", padding: 0, margin: 0 }}>

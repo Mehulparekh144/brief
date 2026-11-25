@@ -236,3 +236,24 @@ select { font: 14px var(--f-ui); color: var(--ink); background: var(--sheet); bo
 .filter-tabs a[aria-current="page"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--hl-line); }
 .filter-tabs .spacer { flex: 1; }
 .filter-tabs a .num { font-size: 11px; margin-left: 4px; }
+
+/* Brie (mascot) and the logo lockup */
+.logo { display: inline-flex; align-items: center; gap: 8px; }
+.logo.big { gap: 14px; }
+.logo-link { text-decoration: none; display: inline-flex; }
+.logo-link:hover { text-decoration: none; }
+.brie { flex: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .brie-thinking { animation: brie-bob 1.4s ease-in-out infinite; }
+  .brie-shocked { animation: brie-jolt 0.5s ease-out 1; }
+  @keyframes brie-bob { 50% { transform: translateY(-3px) rotate(-3deg); } }
+  @keyframes brie-jolt { 30% { transform: scale(1.12); } }
+}
+.ws-meter { justify-self: center; width: 100%; max-width: 480px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; }
+.coach-head { display: flex; gap: 12px; align-items: center; }
+.hero { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 24px 40px; }
+.hero-text { display: grid; gap: 18px; }
+.hero-brie { margin: 0; display: grid; justify-items: center; gap: 12px; max-width: 260px; }
+.bubble { position: relative; background: var(--sheet); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; font-size: 14px; color: var(--ink-2); }
+.bubble::before { content: ""; position: absolute; top: -8px; left: 50%; width: 14px; height: 14px; background: var(--sheet); border-left: 1px solid var(--line); border-top: 1px solid var(--line); transform: translateX(-50%) rotate(45deg); }
+@media (max-width: 760px) { .hero { grid-template-columns: 1fr; } .hero-brie { justify-self: center; } }
