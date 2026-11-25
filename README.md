@@ -59,8 +59,10 @@ The app needs **one** always-on Node server: live sessions run for up to 30 minu
 ### 2. Railway
 
 1. Create a project from this GitHub repo. Railway runs `npm run build` and `npm start`. Node comes from `engines` (22.18 or later).
-2. Add the variables below.
-3. Generate a public domain. Set `SITE_URL` to it, then redeploy.
+   The first build fails with "Missing environment variables". This is expected.
+2. Generate a public domain (service → Settings → Networking).
+3. Add the variables below. `SITE_URL` is `https://` + that domain.
+4. Redeploy. The build stops early if a required variable is missing, or if `SITE_URL` is not https.
 
 | Variable | Value |
 |---|---|

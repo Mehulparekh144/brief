@@ -100,6 +100,7 @@ Re-ran the checklist on `main` (after Brie and TypeScript 7), and again on top o
 - shadcn files that use hooks need `"use client"` (`components.json` has `rsc: true`, so new `npx shadcn add` files get it).
 - Do not add the Geist font that `shadcn init` adds: `--font-sans` maps to our `--font-ui`.
 - canvas-confetti draws in a blob worker: the CSP needs `worker-src 'self' blob:`.
+- `next.config.ts` stops a production build or start when a required variable is missing, and on Railway when `SITE_URL` is not https. Add new required variables to its list.
 - If you add a third-party script, image or API host, add it to the CSP in `next.config.ts`, or the browser blocks it.
 - New tables need `enable row level security` in their migration (the public key can reach every table in `public`).
 - Calibrate many challenges from bash, not zsh: zsh does not split `$VAR` into words (`bash -c 'npm run calibrate -- $NEW'`).
@@ -116,7 +117,7 @@ Re-ran the checklist on `main` (after Brie and TypeScript 7), and again on top o
 - Haiku 5.5 cache prices in `src/meter.ts` are assumed (1.25× write, 0.1× read).
 
 ## Next steps
-0. Merge the open PRs in this order: #15, #16, #17, #14. #14 is stacked on #17: if GitHub does not retarget it to `main` after #17 merges, change its base by hand.
+0. Merge the open PRs in this order: #15, #16, #17, #14, #18. #14 is stacked on #17 and #18 on #14: if GitHub does not retarget it to `main` after #17 merges, change its base by hand.
 1. Deploy to Railway (needs your account). Set env vars, `SITE_URL`, and add the prod callback URL in Supabase.
 2. PostHog key (optional) for funnels and session replay.
 3. Consider harder variants of `needle` and `late-fees` (close to 2×).
