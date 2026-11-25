@@ -100,6 +100,7 @@ Re-ran the checklist on `main` (after Brie and TypeScript 7), and again on top o
 - shadcn files that use hooks need `"use client"` (`components.json` has `rsc: true`, so new `npx shadcn add` files get it).
 - Do not add the Geist font that `shadcn init` adds: `--font-sans` maps to our `--font-ui`.
 - canvas-confetti draws in a blob worker: the CSP needs `worker-src 'self' blob:`.
+- `next.config.ts` stops a production build or start when a required variable is missing, and on Railway when `SITE_URL` is not https. Add new required variables to its list.
 - If you add a third-party script, image or API host, add it to the CSP in `next.config.ts`, or the browser blocks it.
 - New tables need `enable row level security` in their migration (the public key can reach every table in `public`).
 - Calibrate many challenges from bash, not zsh: zsh does not split `$VAR` into words (`bash -c 'npm run calibrate -- $NEW'`).
