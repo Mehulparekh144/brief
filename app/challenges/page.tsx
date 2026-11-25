@@ -64,10 +64,10 @@ export default async function ChallengesPage({ searchParams }: { searchParams: P
           ))}
         </nav>
         <div className="ch-list">
-          {challenges.map((ch) => {
+          {challenges.map((ch, i) => {
             const b = best.get(ch.slug);
             return (
-              <div key={ch.slug} className="ch-row">
+              <div key={ch.slug} className="ch-row" style={{ "--i": Math.min(i, 12) } as React.CSSProperties}>
                 <div style={{ display: "grid", gap: 4 }}>
                   <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                     <h3>{ch.title}</h3>

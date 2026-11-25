@@ -76,6 +76,7 @@ Applied the on-page, technical, schema and agent-readiness checklists from githu
 - Coach on Claude Opus 5.5 with `fallbacks: "default"` (server-side refusal fallback, beta `server-side-fallback-2026-07-01`).
 
 ## Gotchas
+- Motion: use the timing tokens in `app/globals.css` (`--dur-*`, `--ease-*`). Animate only transform and opacity. Put every animation inside `@media (prefers-reduced-motion: no-preference)`, and hover effects inside `@media (hover: hover)`.
 - If you add a third-party script, image or API host, add it to the CSP in `next.config.ts`, or the browser blocks it.
 - New tables need `enable row level security` in their migration (the public key can reach every table in `public`).
 - Calibrate many challenges from bash, not zsh: zsh does not split `$VAR` into words (`bash -c 'npm run calibrate -- $NEW'`).
