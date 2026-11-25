@@ -1,6 +1,12 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 const KINDS = [
   { id: "bug", label: "Bug", hint: "What did you do? What happened? What did you expect?" },
@@ -10,27 +16,29 @@ const KINDS = [
 ] as const;
 
 type Kind = (typeof KINDS)[number]["id"];
+const NONE = "none"; // Radix Select cannot use "" as a value
 
 /** "Report" button: a form for bugs, feature requests and confusion, linked to a session. */
 export function ReportButton({ inline = false }: { inline?: boolean }) {
   const page = usePathname();
   const current = page.match(/^\/s\/([0-9a-f-]{36})/)?.[1] ?? "";
-  const dialog = useRef<HTMLDialogElement>(null);
+  const [open, setOpen] = useState(false);
   const [kind, setKind] = useState<Kind>("bug");
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
-  const [sessionId, setSessionId] = useState(current);
+  const [sessionId, setSessionId] = useState(current || NONE);
   const [sessions, setSessions] = useState<{ id: string; label: string }[]>([]);
   const [sent, setSent] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => setSessionId(current), [current]);
+  useEffect(() => setSessionId(current || NONE), [current]);
 
-  async function open() {
+  async function onOpenChange(next: boolean) {
+    setOpen(next);
+    if (!next) return;
     setSent(null);
     setError(null);
-    dialog.current?.showModal();
     const res = await fetch("/api/reports");
     if (res.ok) setSessions((await res.json()).sessions);
   }
@@ -45,7 +53,7 @@ export function ReportButton({ inline = false }: { inline?: boolean }) {
         kind,
         title,
         details,
-        sessionId,
+        sessionId: sessionId === NONE ? null : sessionId,
         context: { page: location.pathname, viewport: `${innerWidth}x${innerHeight}`, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
       }),
     });
@@ -59,22 +67,31 @@ export function ReportButton({ inline = false }: { inline?: boolean }) {
 
   const hint = KINDS.find((k) => k.id === kind)!.hint;
   return (
-    <>
-      <button className={`btn ${inline ? "" : "fb-fab"}`} onClick={open}>
-        Report
-      </button>
-      <dialog ref={dialog} className="report" aria-labelledby="report-title">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size={inline ? "default" : "lg"} className={inline ? "" : "fb-fab"}>
+          Report
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-lg">
         {sent ? (
-          <div className="report-body">
-            <h2 id="report-title">Report #{sent} sent</h2>
-            <p className="muted">Thanks. We read every report{sessionId ? " and replay the linked session" : ""}.</p>
-            <button className="btn primary" onClick={() => dialog.current?.close()} style={{ justifySelf: "start" }}>
-              Close
-            </button>
-          </div>
+          <>
+            <DialogHeader>
+              <DialogTitle>Report #{sent} sent</DialogTitle>
+              <DialogDescription>Thanks. We read every report{sessionId !== NONE ? " and replay the linked session" : ""}.</DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button>Close</Button>
+              </DialogClose>
+            </DialogFooter>
+          </>
         ) : (
-          <form className="report-body" onSubmit={send}>
-            <h2 id="report-title">Send a report</h2>
+          <form className="grid gap-4" onSubmit={send}>
+            <DialogHeader>
+              <DialogTitle>Send a report</DialogTitle>
+              <DialogDescription>We also attach this page, your browser and your screen size.</DialogDescription>
+            </DialogHeader>
             <fieldset className="kinds">
               <legend className="label">Type</legend>
               {KINDS.map((k) => (
@@ -84,41 +101,45 @@ export function ReportButton({ inline = false }: { inline?: boolean }) {
                 </label>
               ))}
             </fieldset>
-            <label htmlFor="r-title" className="label">
-              Title
-            </label>
-            <input id="r-title" type="text" required maxLength={140} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="One line, for example: Stop button did nothing" />
-            <label htmlFor="r-details" className="label">
-              Details
-            </label>
-            <textarea id="r-details" rows={6} maxLength={8000} value={details} onChange={(e) => setDetails(e.target.value)} placeholder={hint} />
-            <label htmlFor="r-session" className="label">
-              Session (helps us replay the problem)
-            </label>
-            <select id="r-session" value={sessionId} onChange={(e) => setSessionId(e.target.value)}>
-              <option value="">No session</option>
-              {current && !sessions.some((s) => s.id === current) && <option value={current}>This session</option>}
-              {sessions.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.id === current ? `This session · ${s.label}` : s.label}
-                </option>
-              ))}
-            </select>
-            <p className="muted" style={{ fontSize: 12 }}>
-              We also attach this page, your browser and your screen size.
-            </p>
-            {error && <p className="error">{error}</p>}
-            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-              <button type="button" className="btn" onClick={() => dialog.current?.close()}>
-                Cancel
-              </button>
-              <button className="btn primary" disabled={busy || !title.trim()}>
-                {busy ? "Sending…" : "Send report"}
-              </button>
+            <div className="grid gap-2">
+              <Label htmlFor="r-title">Title</Label>
+              <Input id="r-title" required maxLength={140} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="One line, for example: Stop button did nothing" />
             </div>
+            <div className="grid gap-2">
+              <Label htmlFor="r-details">Details</Label>
+              <Textarea id="r-details" rows={6} maxLength={8000} value={details} onChange={(e) => setDetails(e.target.value)} placeholder={hint} />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="r-session">Session (helps us replay the problem)</Label>
+              <Select value={sessionId} onValueChange={setSessionId}>
+                <SelectTrigger id="r-session" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NONE}>No session</SelectItem>
+                  {current && !sessions.some((s) => s.id === current) && <SelectItem value={current}>This session</SelectItem>}
+                  {sessions.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.id === current ? `This session · ${s.label}` : s.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {error && <p className="error">{error}</p>}
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button type="submit" disabled={busy || !title.trim()}>
+                {busy ? "Sending…" : "Send report"}
+              </Button>
+            </DialogFooter>
           </form>
         )}
-      </dialog>
-    </>
+      </DialogContent>
+    </Dialog>
   );
 }

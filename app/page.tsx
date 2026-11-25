@@ -1,4 +1,13 @@
 import Link from "next/link";
+import { BriefRace, type Lane } from "@/components/BriefRace.tsx";
+import { DifficultyChip } from "@/components/Bits.tsx";
+import { ShimmerLink } from "@/components/ShimmerLink.tsx";
+import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { DotPattern } from "@/components/ui/dot-pattern";
+import { Marquee } from "@/components/ui/marquee";
 import { Brie, Logo } from "@/components/Brie.tsx";
 import { Topbar } from "@/components/Topbar.tsx";
 import { currentUser } from "@/lib/auth.ts";
@@ -36,116 +45,107 @@ const jsonLd = (count: number) =>
     ],
   }).replace(/</g, "\\u003c");
 
-const EXAMPLE = [
-  { n: 1, text: "fix the late fee bug", tokens: "16,290", note: "Read 6 files and searched the code" },
-  { n: 2, text: "isLate() in src/billing/lateFee.js compares timestamps…", tokens: "7,685", note: "The par brief: 3 model calls" },
+// Real calibration numbers for late-fees (Claude Haiku 5.5, harness v1): lazy median and par.
+const PAR = 7685;
+const LANES: Lane[] = [
+  { label: "Vague brief", brief: "fix the late fee bug", tokens: 16290, note: "2.1× par · read 6 files first", mood: "worried", tone: "warn" },
+  {
+    label: "Precise brief",
+    brief: "In src/billing/lateFee.js, isLate() compares timestamps with >=. Use daysBetween… Run node --test",
+    tokens: 7685,
+    note: "par · 3 model calls",
+    mood: "happy",
+    tone: "good",
+  },
 ];
+
+// Bento sizes: the two largest categories take two columns.
+const SPAN: Record<Category, string> = { spec: "md:col-span-2", "bug-fix": "md:col-span-2", refactor: "", testing: "", security: "md:col-span-2" };
 
 export default async function Landing({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const me = await currentUser();
   const challenges = listChallenges().map(loadChallenge);
   const { error } = await searchParams;
+  const cta = me?.approved ? { href: "/challenges", label: "Go to practice" } : me ? { href: "/waitlist", label: "You are on the waitlist" } : { href: "/auth/login", label: "Sign in with GitHub" };
   return (
     <>
       <Topbar me={me} />
-      <main className="page">
+      <main className="page landing">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(challenges.length) }} />
         {error === "signin" && <p className="notice bad">Sign-in did not finish. Try again.</p>}
-        <section className="hero">
+
+        <section className="hero relative">
+          <DotPattern className="hero-dots text-[var(--line)]" width={22} height={22} cr={1.2} />
           <div className="hero-text">
-          <Logo big />
-          <span className="label">Practice range for AI coding agents</span>
-          <h1>Get the same result with fewer tokens.</h1>
-          <p>
-            You brief an AI agent on a real coding task. A live meter counts every token. Hidden tests check the result. Then a coach shows you
-            where your tokens went and how to say it better.
-          </p>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            {me?.approved ? (
-              <Link className="btn primary big" href="/challenges">
-                Go to practice
-              </Link>
-            ) : me ? (
-              <Link className="btn primary big" href="/waitlist">
-                You are on the waitlist
-              </Link>
-            ) : (
-              <a className="btn primary big" href="/auth/login">
-                Sign in with GitHub
-              </a>
-            )}
+            <Logo big />
+            <AnimatedShinyText className="label mx-0 justify-start">Practice range for AI coding agents</AnimatedShinyText>
+            <h1>
+              Same fix. <mark>Half the tokens.</mark>
+            </h1>
+            <p>
+              You brief an AI agent on a real coding task. A live meter counts every token. Hidden tests check the result. Then Brie, your coach, shows where
+              the tokens went and how to say it better.
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <ShimmerLink href={cta.href}>{cta.label}</ShimmerLink>
+              <Button asChild variant="ghost" size="lg">
+                <a href="#how">How it works</a>
+              </Button>
+            </div>
           </div>
-          </div>
+          <Card className="race-card relative px-5">
+            <span className="label">The same bug, two briefs · measured</span>
+            <BriefRace lanes={LANES} par={PAR} />
+            <p className="text-xs text-muted-foreground">Claude Haiku 5.5 · both briefs passed the hidden tests · the band is par.</p>
+            <BorderBeam size={90} duration={9} colorFrom="#F7E36A" colorTo="#C9AE00" />
+          </Card>
           <figure className="hero-brie">
-            <Brie mood="happy" size={150} />
-            <figcaption className="bubble">Hi, I&apos;m Brie. Send the agent a clear brief, and I&apos;ll show you where every token went.</figcaption>
+            <Brie mood="happy" size={120} />
+            <figcaption className="bubble">Hi, I&apos;m Brie. Send a clear brief, and I&apos;ll show you where every token went.</figcaption>
           </figure>
         </section>
 
-        <ol className="loop" style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          <li className="card">
-            <span className="label">Step 1</span>
-            <strong>
-              <mark>Brief</mark>
-            </strong>
-            <p>Read the task and the code. Reading is free. Every message you send costs tokens.</p>
-          </li>
-          <li className="card">
-            <span className="label">Step 2</span>
-            <strong>Run</strong>
-            <p>The agent edits code and runs tests in a private sandbox. The meter counts every token, live.</p>
-          </li>
-          <li className="card">
-            <span className="label">Step 3</span>
-            <strong>Debrief</strong>
-            <p>Hidden tests grade the work. The coach shows the cost of each message. Try again and beat par.</p>
-          </li>
+        <Marquee pauseOnHover className="marquee [--duration:60s] [--gap:0.75rem]" aria-label={`${challenges.length} challenges`}>
+          {challenges.map((c) => (
+            <span key={c.slug} className="marquee-item">
+              {c.title}
+              <DifficultyChip level={c.difficulty} />
+            </span>
+          ))}
+        </Marquee>
+
+        <ol id="how" className="loop" style={{ listStyle: "none", padding: 0, margin: 0 }}>
+          {[
+            ["Step 1", "Brief", "Read the task and the code. Reading is free. Every message you send costs tokens."],
+            ["Step 2", "Run", "The agent edits code and runs tests in a private sandbox. The meter counts every token, live."],
+            ["Step 3", "Debrief", "Hidden tests grade the work. Brie shows the cost of each message. Try again and beat par."],
+          ].map(([step, title, text], i) => (
+            <li key={step}>
+              <Card className="h-full px-5">
+                <span className="label">{step}</span>
+                <strong className="text-lg">{i === 0 ? <mark>{title}</mark> : title}</strong>
+                <p>{text}</p>
+              </Card>
+            </li>
+          ))}
         </ol>
 
-        <section style={{ display: "grid", gap: 12 }}>
-          <h2 style={{ fontSize: 22 }}>What you practice</h2>
+        <section className="grid gap-3">
+          <h2>What you practice</h2>
           <p className="muted">
             {challenges.length} challenges in JavaScript and Python, from easy to hard. Each one teaches one briefing skill.
           </p>
-          <div className="loop practice">
+          <div className="loop bento">
             {(Object.keys(CATEGORIES) as Category[]).map((c) => (
-              <div key={c} className="card">
+              <Card key={c} className={`px-5 ${SPAN[c]}`}>
                 <span className="label">{challenges.filter((x) => x.category === c).length} challenges</span>
-                <strong>{CATEGORIES[c]}</strong>
+                <strong className="text-lg">{CATEGORIES[c]}</strong>
                 <p>{PRACTICE[c]}</p>
-              </div>
+              </Card>
             ))}
           </div>
         </section>
 
-        <section className="card">
-          <span className="label">Example · the same bug, two briefs</span>
-          <div className="tbl">
-            <table>
-              <thead>
-                <tr>
-                  <th>Brief</th>
-                  <th className="n">Tokens</th>
-                  <th>What happened</th>
-                </tr>
-              </thead>
-              <tbody>
-                {EXAMPLE.map((r) => (
-                  <tr key={r.n}>
-                    <td>
-                      <code>{r.text}</code>
-                    </td>
-                    <td className="n">{r.tokens}</td>
-                    <td className="muted">{r.note}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="muted" style={{ fontSize: 13 }}>
-            Measured on Claude Haiku 5.5. Both briefs fixed the bug. The precise one used half the tokens.
-          </p>
-        </section>
         <p className="muted" style={{ fontSize: 12 }}>
           Brieflab is a private beta. We save your sessions and use them to improve the product. Ask us and we delete your data.
         </p>

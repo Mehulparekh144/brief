@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import type { Me } from "@/lib/auth.ts";
 import { Analytics } from "./Analytics.tsx";
 import { Logo } from "./Brie.tsx";
@@ -20,13 +21,15 @@ export function Topbar({ me }: { me: Me | null }) {
             {me.avatar && <img className="avatar" src={me.avatar} alt="" />}
             <span className="muted">{me.login}</span>
             <form action="/auth/logout" method="post">
-              <button className="btn">Sign out</button>
+              <Button variant="outline" size="sm" type="submit">
+                Sign out
+              </Button>
             </form>
           </>
         ) : (
-          <a className="btn primary" href="/auth/login">
-            Sign in with GitHub
-          </a>
+          <Button asChild>
+            <a href="/auth/login">Sign in with GitHub</a>
+          </Button>
         )}
       </nav>
       {me?.approved && <ReportButton />}

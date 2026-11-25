@@ -1,24 +1,26 @@
 "use client";
-import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PAR_TEXT } from "@/lib/format.ts";
 
+const TONE = { easy: "good", medium: "warn", hard: "bad" } as const;
+
 export function DifficultyChip({ level }: { level: "easy" | "medium" | "hard" }) {
-  return <span className={`pill diff-${level}`}>{level.toUpperCase()}</span>;
+  return (
+    <Badge variant={TONE[level]} className="font-num tracking-wider">
+      {level.toUpperCase()}
+    </Badge>
+  );
 }
 
 /** "What is par?" with a small popover. */
 export function ParHelp({ label = "What is par?" }: { label?: string }) {
-  const [open, setOpen] = useState(false);
   return (
-    <span className="par-help">
-      <button type="button" className="help" aria-expanded={open} onClick={() => setOpen(!open)} onBlur={() => setOpen(false)}>
-        {label}
-      </button>
-      {open && (
-        <span role="tooltip" className="popover">
-          {PAR_TEXT}
-        </span>
-      )}
-    </span>
+    <Popover>
+      <PopoverTrigger className="help">{label}</PopoverTrigger>
+      <PopoverContent align="end" className="w-80 border-l-4 border-l-[var(--hl-line)] text-sm leading-relaxed">
+        {PAR_TEXT}
+      </PopoverContent>
+    </Popover>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Instrument_Sans, JetBrains_Mono, Martian_Mono } from "next/font/google";
 import { DESCRIPTION, SITE, TITLE } from "@/lib/format.ts";
 import "./globals.css";
+import { cn } from "@/lib/utils";
 
 const ui = Instrument_Sans({ subsets: ["latin"], variable: "--font-ui" });
 const num = Martian_Mono({ subsets: ["latin"], variable: "--font-num", weight: ["400", "500", "600"] });
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${ui.variable} ${num.variable} ${code.variable}`}>
+    <html lang="en" className={cn(ui.variable, num.variable, code.variable, "font-sans")}>
       <body>{children}</body>
     </html>
   );

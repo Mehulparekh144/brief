@@ -1,4 +1,5 @@
-import { fmt, k, vsPar } from "@/lib/format.ts";
+import { k, vsPar } from "@/lib/format.ts";
+import { Count } from "./Count.tsx";
 import type { Par } from "@/src/challenge.ts";
 
 /** Live token meter: fill to the cap, highlighter band at par. */
@@ -10,7 +11,7 @@ export function Meter({ tokens, par, cap }: { tokens: number; par: Par | null; c
   return (
     <div className={`meter ${tone}`} role="meter" aria-label="Tokens used" aria-valuenow={tokens} aria-valuemin={0} aria-valuemax={cap}>
       <div className="meter-row">
-        <span className="meter-num">{fmt(tokens)}</span>
+        <Count value={tokens} className="meter-num" />
         <span className="muted" style={{ fontSize: 12 }}>
           tokens
         </span>

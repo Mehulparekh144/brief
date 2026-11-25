@@ -2,6 +2,10 @@ import { StartButton } from "@/components/StartButton.tsx";
 import { Topbar } from "@/components/Topbar.tsx";
 import { requireUser } from "@/lib/auth.ts";
 import { DifficultyChip } from "@/components/Bits.tsx";
+import { LinkTabs } from "@/components/LinkTabs.tsx";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { byDifficulty, fmt, PAR_TEXT, parRange, staleBefore } from "@/lib/format.ts";
 import Link from "next/link";
 
@@ -47,32 +51,32 @@ export default async function ChallengesPage({ searchParams }: { searchParams: P
             <span>
               Your <b>{running.title}</b> session is still open. Finish or submit it before you start another one.
             </span>
-            <Link className="btn primary" href={`/s/${running.id}`}>
-              Resume
-            </Link>
+            <Button asChild>
+              <Link href={`/s/${running.id}`}>Resume</Link>
+            </Button>
           </div>
         )}
         {error && <p className="notice bad">{error}</p>}
-        <nav className="filter-tabs" aria-label="Categories">
-          <Link href="/challenges" aria-current={!active ? "page" : undefined}>
-            All <span className="muted num">{all.length}</span>
-          </Link>
-          {(Object.keys(CATEGORIES) as Category[]).map((c) => (
-            <Link key={c} href={`/challenges?category=${c}`} aria-current={active === c ? "page" : undefined}>
-              {CATEGORIES[c]} <span className="muted num">{count(c)}</span>
-            </Link>
-          ))}
-        </nav>
+        <LinkTabs
+          label="Categories"
+          value={active ?? "all"}
+          tabs={[
+            { value: "all", label: "All", href: "/challenges", count: all.length },
+            ...(Object.keys(CATEGORIES) as Category[]).map((c) => ({ value: c, label: CATEGORIES[c], href: `/challenges?category=${c}`, count: count(c) })),
+          ]}
+        />
         <div className="ch-list">
           {challenges.map((ch, i) => {
             const b = best.get(ch.slug);
             return (
-              <div key={ch.slug} className="ch-row" style={{ "--i": Math.min(i, 12) } as React.CSSProperties}>
+              <Card key={ch.slug} className="ch-row grid px-5" style={{ "--i": Math.min(i, 12) } as React.CSSProperties}>
                 <div style={{ display: "grid", gap: 4 }}>
                   <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                     <h3>{ch.title}</h3>
                     <DifficultyChip level={ch.difficulty} />
-                    <span className="pill">{CATEGORIES[ch.category]}</span>
+                    <Badge variant="secondary" className="font-num">
+                      {CATEGORIES[ch.category]}
+                    </Badge>
                   </div>
                   <p className="muted">{ch.statement.split("\n")[0]}</p>
                   <span className="label">Skill: {ch.skill}</span>
@@ -88,7 +92,7 @@ export default async function ChallengesPage({ searchParams }: { searchParams: P
                   {b?.best != null ? fmt(b.best) : b?.tries ? `${b.tries} tries` : "—"}
                 </div>
                 <StartButton slug={ch.slug} label={b?.tries ? "Try again" : "Start"} />
-              </div>
+              </Card>
             );
           })}
         </div>

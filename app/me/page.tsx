@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Topbar } from "@/components/Topbar.tsx";
 import { requireUser } from "@/lib/auth.ts";
 import { fmt, verdict, vsPar } from "@/lib/format.ts";
@@ -32,48 +35,48 @@ export default async function HistoryPage() {
             No sessions yet. <Link href="/challenges">Pick a challenge</Link> to start.
           </p>
         ) : (
-          <div className="tbl card">
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Challenge</th>
-                  <th>Result</th>
-                  <th className="n">Tokens</th>
-                  <th>vs par</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
+          <Card className="px-3">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Challenge</TableHead>
+                  <TableHead>Result</TableHead>
+                  <TableHead className="text-right font-num tabular-nums">Tokens</TableHead>
+                  <TableHead>vs par</TableHead>
+                  <TableHead />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {rows.map((r) => {
                   const ch = challenges.get(r.challenge);
                   const v = verdict(r.tokens_total, ch?.par);
                   return (
-                    <tr key={r.id}>
-                      <td className="num" style={{ fontSize: 12 }}>
+                    <TableRow key={r.id}>
+                      <TableCell className="num" style={{ fontSize: 12 }}>
                         {new Date(r.started_at).toISOString().slice(0, 16).replace("T", " ")}
-                      </td>
-                      <td>{ch?.title ?? r.challenge}</td>
-                      <td>
+                      </TableCell>
+                      <TableCell>{ch?.title ?? r.challenge}</TableCell>
+                      <TableCell>
                         {r.status !== "submitted" ? (
-                          <span className="pill">Not graded</span>
+                          <Badge variant="secondary" className="font-num">Not graded</Badge>
                         ) : r.passed ? (
-                          <span className={`pill ${v.tone}`}>{v.label}</span>
+                          <Badge variant={(v.tone) || "secondary"} className="font-num">{v.label}</Badge>
                         ) : (
-                          <span className="pill bad">
+                          <Badge variant="bad" className="font-num">
                             Failed {r.tests_passed}/{r.tests_total}
-                          </span>
+                          </Badge>
                         )}
-                      </td>
-                      <td className="n">{fmt(r.tokens_total)}</td>
-                      <td className="muted">{r.status === "submitted" ? vsPar(r.tokens_total, ch?.par) : ""}</td>
-                      <td>{r.status === "submitted" && <Link href={`/s/${r.id}/debrief`}>Debrief</Link>}</td>
-                    </tr>
+                      </TableCell>
+                      <TableCell className="text-right font-num tabular-nums">{fmt(r.tokens_total)}</TableCell>
+                      <TableCell className="muted">{r.status === "submitted" ? vsPar(r.tokens_total, ch?.par) : ""}</TableCell>
+                      <TableCell>{r.status === "submitted" && <Link href={`/s/${r.id}/debrief`}>Debrief</Link>}</TableCell>
+                    </TableRow>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
+          </Card>
         )}
       </main>
     </>

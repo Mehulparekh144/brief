@@ -13,6 +13,7 @@ const csp = [
   "img-src 'self' blob: data: https://avatars.githubusercontent.com",
   "font-src 'self'",
   `connect-src 'self' ${posthog} ${posthogAssets}`,
+  "worker-src 'self' blob:", // canvas-confetti draws in a worker made from a blob URL
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
