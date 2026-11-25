@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, JetBrains_Mono, Martian_Mono } from "next/font/google";
+import { DESCRIPTION, SITE, TITLE } from "@/lib/format.ts";
 import "./globals.css";
 
 const ui = Instrument_Sans({ subsets: ["latin"], variable: "--font-ui" });
@@ -7,8 +8,11 @@ const num = Martian_Mono({ subsets: ["latin"], variable: "--font-num", weight: [
 const code = JetBrains_Mono({ subsets: ["latin"], variable: "--font-code", weight: ["400", "500"] });
 
 export const metadata: Metadata = {
-  title: "Brieflab",
-  description: "Practice guiding AI coding agents. Get the same result with fewer tokens.",
+  metadataBase: new URL(SITE),
+  title: { default: TITLE, template: "%s · Brieflab" },
+  description: DESCRIPTION,
+  openGraph: { type: "website", siteName: "Brieflab", title: TITLE, description: DESCRIPTION, url: "/" },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

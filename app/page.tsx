@@ -2,8 +2,39 @@ import Link from "next/link";
 import { Brie, Logo } from "@/components/Brie.tsx";
 import { Topbar } from "@/components/Topbar.tsx";
 import { currentUser } from "@/lib/auth.ts";
+import { DESCRIPTION, SITE } from "@/lib/format.ts";
+import { CATEGORIES, type Category, listChallenges, loadChallenge } from "@/src/challenge.ts";
 
 export const dynamic = "force-dynamic";
+export const metadata = { alternates: { canonical: "/" } };
+
+const PRACTICE: Record<Category, string> = {
+  "bug-fix": "Name the file, the symptom and the real cause, so the agent does not search.",
+  spec: "Give every rule and edge case up front, so the agent does not guess.",
+  refactor: "Say what to change and what not to touch.",
+  testing: "Show the exact shape of the tests you want.",
+  security: "State the threat and the safe pattern, such as parameters for SQL.",
+};
+
+// Structured data. "<" is escaped so the JSON cannot close the script tag.
+const jsonLd = (count: number) =>
+  JSON.stringify({
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "Organization", "@id": `${SITE}/#org`, name: "Brieflab", url: `${SITE}/`, logo: `${SITE}/icon.svg` },
+      {
+        "@type": "WebApplication",
+        name: "Brieflab",
+        url: `${SITE}/`,
+        description: DESCRIPTION,
+        applicationCategory: "EducationalApplication",
+        operatingSystem: "Web",
+        publisher: { "@id": `${SITE}/#org` },
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        featureList: [`${count} coding challenges`, "Live token meter", "Hidden-test grading", "AI coach debrief"],
+      },
+    ],
+  }).replace(/</g, "\\u003c");
 
 const EXAMPLE = [
   { n: 1, text: "fix the late fee bug", tokens: "16,290", note: "Read 6 files and searched the code" },
@@ -12,11 +43,13 @@ const EXAMPLE = [
 
 export default async function Landing({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const me = await currentUser();
+  const challenges = listChallenges().map(loadChallenge);
   const { error } = await searchParams;
   return (
     <>
       <Topbar me={me} />
       <main className="page">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(challenges.length) }} />
         {error === "signin" && <p className="notice bad">Sign-in did not finish. Try again.</p>}
         <section className="hero">
           <div className="hero-text">
@@ -68,6 +101,22 @@ export default async function Landing({ searchParams }: { searchParams: Promise<
             <p>Hidden tests grade the work. The coach shows the cost of each message. Try again and beat par.</p>
           </li>
         </ol>
+
+        <section style={{ display: "grid", gap: 12 }}>
+          <h2 style={{ fontSize: 22 }}>What you practice</h2>
+          <p className="muted">
+            {challenges.length} challenges in JavaScript and Python, from easy to hard. Each one teaches one briefing skill.
+          </p>
+          <div className="loop practice">
+            {(Object.keys(CATEGORIES) as Category[]).map((c) => (
+              <div key={c} className="card">
+                <span className="label">{challenges.filter((x) => x.category === c).length} challenges</span>
+                <strong>{CATEGORIES[c]}</strong>
+                <p>{PRACTICE[c]}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         <section className="card">
           <span className="label">Example · the same bug, two briefs</span>

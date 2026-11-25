@@ -4,6 +4,13 @@ import type { Par } from "../src/challenge.ts";
 /** A live session refreshes heartbeat_at every 15 s; one silent for 60 s is gone (server restart or crash). */
 export const staleBefore = () => new Date(Date.now() - 60_000).toISOString();
 
+/** Public base URL (no trailing slash). Server-side only. */
+export const SITE = (process.env.SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+
+export const TITLE = "Brieflab: practice briefing AI coding agents";
+export const DESCRIPTION =
+  "Practice guiding AI coding agents on real code. A live meter counts every token, hidden tests grade the fix, and a coach shows how to brief with fewer tokens.";
+
 export type BrieMood = "neutral" | "happy" | "worried" | "shocked" | "thinking";
 
 /** Brie's mood for a token count: thinking while busy, shocked near the cap, worried over par, happy at or under par. */

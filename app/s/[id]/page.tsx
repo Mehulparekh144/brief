@@ -8,6 +8,7 @@ import { db } from "@/lib/supabase.ts";
 import { capFor, loadChallenge } from "@/src/challenge.ts";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Workspace" };
 
 export default async function WorkspacePage({ params }: { params: Promise<{ id: string }> }) {
   const me = await requireUser();

@@ -4,6 +4,7 @@ import { Topbar } from "@/components/Topbar.tsx";
 import { currentUser } from "@/lib/auth.ts";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Waitlist" };
 
 export default async function Waitlist() {
   const me = await currentUser();

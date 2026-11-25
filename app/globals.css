@@ -257,3 +257,4 @@ select { font: 14px var(--f-ui); color: var(--ink); background: var(--sheet); bo
 .bubble { position: relative; background: var(--sheet); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; font-size: 14px; color: var(--ink-2); }
 .bubble::before { content: ""; position: absolute; top: -8px; left: 50%; width: 14px; height: 14px; background: var(--sheet); border-left: 1px solid var(--line); border-top: 1px solid var(--line); transform: translateX(-50%) rotate(45deg); }
 @media (max-width: 760px) { .hero { grid-template-columns: 1fr; } .hero-brie { justify-self: center; } }
+.loop.practice { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }

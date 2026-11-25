@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth.ts";
 import { db } from "@/lib/supabase.ts";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Reports" };
 
 const KIND_LABEL: Record<string, string> = { bug: "Bug", feature: "Feature", confusing: "Confusing", other: "Other", note: "Note", rating: "Rating" };
 const KIND_TONE: Record<string, string> = { bug: "bad", feature: "good", confusing: "warn" };

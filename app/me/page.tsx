@@ -6,6 +6,7 @@ import { db } from "@/lib/supabase.ts";
 import { type Challenge, listChallenges, loadChallenge } from "@/src/challenge.ts";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "My sessions" };
 
 export default async function HistoryPage() {
   const me = await requireUser();

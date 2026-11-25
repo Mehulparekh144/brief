@@ -7,6 +7,7 @@ import { fmt } from "@/lib/format.ts";
 import { db } from "@/lib/supabase.ts";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Report" };
 
 const TONE: Record<string, string> = { user: "good", error: "bad", stop: "warn", notice: "warn" };
 

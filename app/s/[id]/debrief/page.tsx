@@ -13,6 +13,7 @@ import { db } from "@/lib/supabase.ts";
 import { loadChallenge } from "@/src/challenge.ts";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Debrief" };
 
 type Brief = { text: string; tokens: number; actions: string[] };
 const COLORS = ["var(--s1)", "var(--s2)", "var(--s3)"];

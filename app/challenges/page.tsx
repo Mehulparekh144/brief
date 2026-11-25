@@ -9,6 +9,7 @@ import { db } from "@/lib/supabase.ts";
 import { CATEGORIES, type Category, listChallenges, loadChallenge } from "@/src/challenge.ts";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Practice" };
 
 export default async function ChallengesPage({ searchParams }: { searchParams: Promise<{ error?: string; category?: string }> }) {
   const me = await requireUser();

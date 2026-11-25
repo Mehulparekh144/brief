@@ -58,6 +58,12 @@ Checked against the security-review checklist (github.com/WorldFlowAI/everything
 - Logo lockup `<Logo />` (Brie mark + "brieflab" wordmark): top bars and large on the landing page. Favicon: `app/icon.svg`.
 - Brie is the coach's face ("Brie's debrief"). She is not the agent: the agent stays a plain tool in the chat.
 
+## SEO (2026-11-24)
+Applied the on-page, technical, schema and agent-readiness checklists from github.com/AgricIDaniel/claude-seo (read as data; the plugin and its scripts were not installed).
+- Landing: title 44 chars, description 158, canonical, Open Graph + Twitter card, `app/opengraph-image.tsx` (Brie + tagline), JSON-LD (Organization + WebApplication), a "What you practice" section.
+- `app/robots.ts` (private paths disallowed; AI crawlers allowed on the landing page), `app/sitemap.ts`, `app/llms.txt/route.ts`, tab titles on every page (`%s · Brieflab`).
+- `robots.txt`, `sitemap.xml` and the OG image are static at build time: set `SITE_URL` before the production build.
+
 ## Key decisions and why
 - Agent loop on our server; only tools run in the sandbox (no keys or internet inside). No LiteLLM.
 - Manual loop instead of the SDK tool runner: cap checks before each call and per-message token counts.
