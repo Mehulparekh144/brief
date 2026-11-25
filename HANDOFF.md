@@ -116,6 +116,7 @@ Re-ran the checklist on `main` (after Brie and TypeScript 7), and again on top o
 - Haiku 5.5 cache prices in `src/meter.ts` are assumed (1.25× write, 0.1× read).
 
 ## Next steps
+0. Merge the open PRs in this order: #15, #16, #17, #14. #14 is stacked on #17: if GitHub does not retarget it to `main` after #17 merges, change its base by hand.
 1. Deploy to Railway (needs your account). Set env vars, `SITE_URL`, and add the prod callback URL in Supabase.
 2. PostHog key (optional) for funnels and session replay.
 3. Consider harder variants of `needle` and `late-fees` (close to 2×).
