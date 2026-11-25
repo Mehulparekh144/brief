@@ -2,10 +2,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fmt, k, PAR_TEXT, parRange } from "@/lib/format.ts";
+import { fmt, k, moodFor, PAR_TEXT, parRange } from "@/lib/format.ts";
 import type { Par } from "@/src/challenge.ts";
 import { track } from "./Analytics.tsx";
 import { DifficultyChip, ParHelp } from "./Bits.tsx";
+import { Brie, Logo } from "./Brie.tsx";
 import { Code } from "./Code.tsx";
 import { Meter } from "./Meter.tsx";
 import { ReportButton } from "./Report.tsx";
@@ -191,17 +192,20 @@ export function Workspace({ id, slug, title, difficulty, skill, statement, par, 
   return (
     <div className="ws">
       <div className="ws-top">
-        <Link href="/challenges" className="wm">
-          <b>brief</b>lab
+        <Link href="/challenges" className="logo-link" aria-label="Back to practice">
+          <Logo />
         </Link>
         <div className="ws-title">
           <strong>{title}</strong>
           <DifficultyChip level={difficulty} />
         </div>
-        <div style={{ justifySelf: "center", width: "100%", maxWidth: 440, display: "grid", gap: 2 }}>
-          <Meter tokens={tokens} par={par} cap={cap} />
-          <div style={{ justifySelf: "end" }}>
-            <ParHelp />
+        <div className="ws-meter">
+          <Brie mood={moodFor(tokens, par, cap, busy)} size={40} />
+          <div style={{ display: "grid", gap: 2, minWidth: 0 }}>
+            <Meter tokens={tokens} par={par} cap={cap} />
+            <div style={{ justifySelf: "end" }}>
+              <ParHelp />
+            </div>
           </div>
         </div>
         <div className="ws-actions">

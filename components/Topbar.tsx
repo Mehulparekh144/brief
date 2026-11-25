@@ -1,14 +1,15 @@
 import Link from "next/link";
 import type { Me } from "@/lib/auth.ts";
 import { Analytics } from "./Analytics.tsx";
+import { Logo } from "./Brie.tsx";
 import { ReportButton } from "./Report.tsx";
 
 export function Topbar({ me }: { me: Me | null }) {
   return (
     <header className="topbar">
       <Analytics userId={me?.id} login={me?.login} />
-      <Link href={me?.approved ? "/challenges" : "/"} className="wm">
-        <b>brief</b>lab
+      <Link href={me?.approved ? "/challenges" : "/"} className="logo-link" aria-label="Brieflab home">
+        <Logo />
       </Link>
       <nav>
         {me ? (

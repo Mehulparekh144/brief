@@ -1,6 +1,6 @@
 # HANDOFF — Brieflab (agent practice platform)
 
-Last updated: 2026-11-23
+Last updated: 2026-11-24
 
 - Plan (scope, design, brand, costs, timeline): https://claude.ai/artifact/HTejiT3ahANGfuASqt7b2J
 - Repo: https://github.com/Mehulparekh144/brief (private). Work lands as one PR per task.
@@ -51,6 +51,12 @@ Checked against the security-review checklist (github.com/WorldFlowAI/everything
 - Already fine: no secrets in code or git history, `npm audit` clean, Supabase query builder only (no raw SQL), React escaping
   (one `dangerouslySetInnerHTML`, on highlight.js output, which escapes), ownership and admin checks on every route, generic errors.
 - Kept SameSite=Lax (not Strict): Strict drops the session when users arrive from another site.
+
+## Mascot and logo (2026-11-24)
+- Mascot: **Brie**, a highlighter-yellow briefing card (user picked her from 3 concepts). `components/Brie.tsx`: moods neutral, happy, worried, shocked, thinking.
+- Mood follows the meter (`moodFor` in `lib/format.ts`): thinking while the agent works, shocked near the cap, worried over par, happy at or under par.
+- Logo lockup `<Logo />` (Brie mark + "brieflab" wordmark): top bars and large on the landing page. Favicon: `app/icon.svg`.
+- Brie is the coach's face ("Brie's debrief"). She is not the agent: the agent stays a plain tool in the chat.
 
 ## Key decisions and why
 - Agent loop on our server; only tools run in the sandbox (no keys or internet inside). No LiteLLM.

@@ -128,7 +128,7 @@ const debrief = row.debrief as { summary?: string; tips?: unknown[]; error?: str
 assert.ok(!debrief.error, debrief.error ?? "");
 const page = await call(`/s/${id}/debrief`);
 assert.equal(page.status, 200);
-assert.match(await page.text(), /Coach/);
+assert.match(await page.text(), /Brie(&#x27;|&apos;|')s debrief/);
 step(`debrief: ${debrief.tips?.length} tips, coach cost $${Number(row.coach_cost_usd).toFixed(4)}`);
 console.log(`  summary: ${debrief.summary}`);
 
