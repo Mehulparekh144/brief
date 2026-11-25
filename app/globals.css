@@ -201,6 +201,7 @@ button.tab[aria-selected="true"], .tab.on { background: var(--code-bg); box-shad
 .hero p { font-size: 1.15rem; color: var(--ink-2); max-width: 58ch; }
 .loop { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .loop .card strong { font-size: 18px; }
+.loop.practice { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
 @media (max-width: 760px) { .loop { grid-template-columns: 1fr; } }
 
 /* difficulty + par help */
@@ -257,4 +258,3 @@ select { font: 14px var(--f-ui); color: var(--ink); background: var(--sheet); bo
 .bubble { position: relative; background: var(--sheet); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; font-size: 14px; color: var(--ink-2); }
 .bubble::before { content: ""; position: absolute; top: -8px; left: 50%; width: 14px; height: 14px; background: var(--sheet); border-left: 1px solid var(--line); border-top: 1px solid var(--line); transform: translateX(-50%) rotate(45deg); }
 @media (max-width: 760px) { .hero { grid-template-columns: 1fr; } .hero-brie { justify-self: center; } }
-.loop.practice { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
