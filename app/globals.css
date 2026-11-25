@@ -257,7 +257,7 @@ select { font: 14px var(--f-ui); color: var(--ink); background: var(--sheet); bo
    exceptions (lift shadow, skeleton shimmer). Hover effects only on devices that hover.
    Everything here is off under prefers-reduced-motion: state changes are then instant. */
 :root {
-  --dur-press: 100ms; --dur-hover: 180ms; --dur-pop: 200ms; --dur-enter: 250ms; --dur-modal: 300ms; --dur-meter: 300ms;
+  --dur-press: 100ms; --dur-hover: 180ms; --dur-pop: 200ms; --dur-enter: 250ms; --dur-modal: 300ms; --dur-meter: 300ms; --dur-page: 400ms;
   --ease-out: cubic-bezier(0, 0, 0.2, 1);    /* things entering */
   --ease-in: cubic-bezier(0.4, 0, 1, 1);     /* things leaving */
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1); /* state changes on screen */
@@ -273,7 +273,7 @@ select { font: 14px var(--f-ui); color: var(--ink); background: var(--sheet); bo
     .ch-row:hover, .loop .card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgb(0 0 0 / 0.08); }
   }
   /* New chat steps, coach tips and the better brief slide in. */
-  .msg, .step, .agent-say, .sys, .tip, .better { animation: enter var(--dur-enter) var(--ease-out) both; }
+  .msg, .step, .agent-say, .sys, .tip, .better { animation: enter var(--dur-enter) var(--ease-out) backwards; }
   .tip:nth-of-type(2) { animation-delay: 60ms; }
   .tip:nth-of-type(3) { animation-delay: 120ms; }
   .tip:nth-of-type(4) { animation-delay: 180ms; }
@@ -282,9 +282,39 @@ select { font: 14px var(--f-ui); color: var(--ink); background: var(--sheet); bo
   dialog.report[open]::backdrop { animation: fade var(--dur-modal) var(--ease-out) both; }
   .skeleton { background: linear-gradient(90deg, var(--sheet-2) 25%, var(--line) 50%, var(--sheet-2) 75%); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; }
   /* Brie: a small pop when she appears or changes mood; thinking bobs; shocked jolts. */
-  .brie { animation: brie-pop var(--dur-modal) var(--ease-out) both; }
+  .brie { animation: brie-pop var(--dur-modal) var(--ease-out) backwards; }
   .brie-thinking { animation: brie-bob 1.4s var(--ease-in-out) infinite; }
   .brie-shocked { animation: brie-jolt 500ms var(--ease-out) 1; }
+  /* Page load. The top bar stays still; the content below it builds in order. "backwards" fill keeps
+     each item hidden only during its own delay, and leaves nothing behind (hover lifts still work). */
+  .page > * { animation: rise var(--dur-page) var(--ease-out) backwards; }
+  .page > :nth-child(2) { animation-delay: 60ms; }
+  .page > :nth-child(3) { animation-delay: 120ms; }
+  .page > :nth-child(4) { animation-delay: 180ms; }
+  .page > :nth-child(5) { animation-delay: 240ms; }
+  .page > :nth-child(n + 6) { animation-delay: 300ms; }
+  .ch-row { animation: rise var(--dur-page) var(--ease-out) backwards; animation-delay: calc(200ms + var(--i, 0) * 35ms); }
+  .db-grid > .card { animation: rise var(--dur-page) var(--ease-out) backwards; }
+  .db-grid > .card + .card { animation-delay: 90ms; }
+  .ws-files, .editor, .agent { animation: fade var(--dur-page) var(--ease-out) backwards; }
+  .editor { animation-delay: 60ms; }
+  .agent { animation-delay: 120ms; }
+  /* Landing: hero builds in order, Brie pops in and floats, her bubble follows, cards rise one by one. */
+  .hero-text > * { animation: rise var(--dur-page) var(--ease-out) backwards; }
+  .hero-text > :nth-child(2) { animation-delay: 80ms; }
+  .hero-text > :nth-child(3) { animation-delay: 160ms; }
+  .hero-text > :nth-child(4) { animation-delay: 240ms; }
+  .hero-text > :nth-child(5) { animation-delay: 320ms; }
+  .hero-brie .brie { animation: brie-pop 500ms var(--ease-out) 250ms backwards, brie-float 3.2s var(--ease-in-out) 900ms infinite; }
+  .hero-brie .bubble { animation: pop var(--dur-modal) var(--ease-out) 650ms backwards; transform-origin: top center; }
+  .loop > * { animation: rise var(--dur-page) var(--ease-out) backwards; }
+  .loop > :nth-child(1) { animation-delay: 380ms; }
+  .loop > :nth-child(2) { animation-delay: 460ms; }
+  .loop > :nth-child(3) { animation-delay: 540ms; }
+  .loop > :nth-child(4) { animation-delay: 620ms; }
+  .loop > :nth-child(5) { animation-delay: 700ms; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+  @keyframes brie-float { 50% { transform: translateY(-6px); } }
   @keyframes enter { from { opacity: 0; transform: translateY(8px); } }
   @keyframes pop { from { opacity: 0; transform: scale(0.96); } }
   @keyframes modal { from { opacity: 0; transform: translateY(8px) scale(0.98); } }
