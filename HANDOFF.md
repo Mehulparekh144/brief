@@ -73,6 +73,16 @@ User asked for shadcn and Magic UI components, and the awwwards skill (github.co
 - Landing rebuilt (awwwards brief): dot-grid hero, "Same fix. Half the tokens.", a measured brief race (`components/BriefRace.tsx`, real late-fees calibration: 16,290 vs 7,685 tokens), challenge marquee, step cards, category bento.
 - Checked in a browser at 375, 768, 1280 and 1920 px, dark and light: no horizontal scroll, no dev-overlay issues, only same-origin requests.
 
+## Final security review before deploy (2026-11-24)
+Re-ran the checklist on `main` (after Brie and TypeScript 7), and again on top of #15–#17. No new issues in code.
+- No secrets in git history (all branches). `npm audit --omit=dev`: 0 (the `shadcn` CLI is a dev dependency; its `minimatch` advisory does not ship).
+- Two `dangerouslySetInnerHTML`: escaped highlight.js output, and the landing JSON-LD with `<` escaped.
+- RLS on all 5 tables, no policies. With the public key: every table returns `[]` or "permission denied"; inserts blocked.
+  `handle_new_user` is security definer with an empty search_path, and anon cannot execute it.
+- Production build: CSP without `unsafe-eval`, HSTS, `Secure HttpOnly SameSite=lax` cookies, `/.env` and challenge solutions are not served.
+- Open item: the dev Supabase project has the Email provider on (only for the e2e test user). Production must use a separate project with Email off.
+- Deploy prep: `railway.json` (1 replica, health check, restart on failure) and a full runbook in README → Deploy.
+
 ## Key decisions and why
 - Agent loop on our server; only tools run in the sandbox (no keys or internet inside). No LiteLLM.
 - Manual loop instead of the SDK tool runner: cap checks before each call and per-message token counts.
@@ -106,6 +116,7 @@ User asked for shadcn and Magic UI components, and the awwwards skill (github.co
 - Haiku 5.5 cache prices in `src/meter.ts` are assumed (1.25× write, 0.1× read).
 
 ## Next steps
+0. Merge the open PRs in this order: #15, #16, #17, #14. #14 is stacked on #17: if GitHub does not retarget it to `main` after #17 merges, change its base by hand.
 1. Deploy to Railway (needs your account). Set env vars, `SITE_URL`, and add the prod callback URL in Supabase.
 2. PostHog key (optional) for funnels and session replay.
 3. Consider harder variants of `needle` and `late-fees` (close to 2×).
